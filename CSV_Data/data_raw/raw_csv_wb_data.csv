@@ -1,0 +1,471 @@
+pais,iso,migracion_neta,anio
+Afghanistan,AFG,-199996,2017
+Albania,ALB,-50002,2017
+Algeria,DZA,-50002,2017
+Angola,AGO,0,2017
+Antigua and Barbuda,ATG,-56,2017
+Arab World,ARB,81151,2017
+Argentina,ARG,24002,2017
+Armenia,ARM,-24989,2017
+Aruba,ABW,1004,2017
+Australia,AUS,851998,2017
+Austria,AUT,99999,2017
+Azerbaijan,AZE,-34001,2017
+"Bahamas, The",BHS,5372,2017
+Bahrain,BHR,33001,2017
+Bangladesh,BGD,-1614475,2017
+Barbados,BRB,2069,2017
+Belarus,BLR,10000,2017
+Belgium,BEL,240000,2017
+Belize,BLZ,6832,2017
+Benin,BEN,-10000,2017
+Bhutan,BTN,0,2017
+Bolivia,BOL,-50005,2017
+Bosnia and Herzegovina,BIH,-2506,2017
+Botswana,BWA,15000,2017
+Brazil,BRA,37195,2017
+Brunei Darussalam,BRN,1760,2017
+Bulgaria,BGR,-50000,2017
+Burkina Faso,BFA,-125000,2017
+Burundi,BDI,20000,2017
+Cabo Verde,CPV,-8291,2017
+Cambodia,KHM,-149999,2017
+Cameroon,CMR,-40000,2017
+Canada,CAN,1099999,2017
+Caribbean small states,CSS,-116300,2017
+Central African Republic,CAF,9500,2017
+Central Europe and the Baltics,CEB,-213631,2017
+Chad,TCD,80000,2017
+Channel Islands,CHI,3654,2017
+Chile,CHL,208609,2017
+China,CHN,-1500000,2017
+Colombia,COL,-147004,2017
+Comoros,COM,-10000,2017
+"Congo, Dem. Rep.",COD,0,2017
+"Congo, Rep.",COG,-20000,2017
+Costa Rica,CRI,16384,2017
+Cote d'Ivoire,CIV,30000,2017
+Croatia,HRV,-2580,2017
+Cuba,CUB,-109998,2017
+Curacao,CUW,2856,2017
+Cyprus,CYP,30000,2017
+Czech Republic,CZE,59997,2017
+Denmark,DNK,75998,2017
+Djibouti,DJI,-10999,2017
+Dominican Republic,DOM,-151333,2017
+Early-demographic dividend,EAR,-8400014,2017
+East Asia & Pacific,EAS,-1213995,2017
+East Asia & Pacific (excluding high income),EAP,-3058360,2017
+East Asia & Pacific (IDA & IBRD countries),TEA,-3058360,2017
+Ecuador,ECU,-30776,2017
+"Egypt, Arab Rep.",EGY,-215681,2017
+El Salvador,SLV,-202694,2017
+Equatorial Guinea,GNQ,20000,2017
+Eritrea,ERI,-49999,2017
+Estonia,EST,-4999,2017
+Ethiopia,ETH,-60001,2017
+Euro area,EMU,2494945,2017
+Europe & Central Asia,ECS,3511448,2017
+Europe & Central Asia (excluding high income),ECA,-620468,2017
+Europe & Central Asia (IDA & IBRD countries),TEC,-658558,2017
+European Union,EUU,3434670,2017
+Fiji,FJI,-28720,2017
+Finland,FIN,58003,2017
+Fragile and conflict affected situations,FCS,-535138,2017
+France,FRA,400002,2017
+French Polynesia,PYF,-500,2017
+Gabon,GAB,5000,2017
+"Gambia, The",GMB,-13000,2017
+Georgia,GEO,-50000,2017
+Germany,DEU,750000,2017
+Ghana,GHA,-100000,2017
+Greece,GRC,49996,2017
+Grenada,GRD,-3501,2017
+Guam,GUM,0,2017
+Guatemala,GTM,-94769,2017
+Guinea,GIN,-10000,2017
+Guinea-Bissau,GNB,-10000,2017
+Guyana,GUY,-24552,2017
+Haiti,HTI,-175000,2017
+Heavily indebted poor countries (HIPC),HPC,-2162630,2017
+High income,HIC,13096109,2017
+Honduras,HND,-63746,2017
+"Hong Kong SAR, China",HKG,150000,2017
+Hungary,HUN,29999,2017
+Iceland,ISL,1902,2017
+India,IND,-1886002,2017
+Indonesia,IDN,-700000,2017
+"Iran, Islamic Rep.",IRN,-143933,2017
+Iraq,IRQ,20257,2017
+Ireland,IRL,23497,2017
+Israel,ISR,50002,2017
+Italy,ITA,528268,2017
+Jamaica,JAM,-90000,2017
+Japan,JPN,250000,2017
+Jordan,JOR,-258306,2017
+Kazakhstan,KAZ,0,2017
+Kenya,KEN,-50000,2017
+Kiribati,KIR,-2128,2017
+"Korea, Dem. People’s Rep.",PRK,0,2017
+"Korea, Rep.",KOR,200000,2017
+Kuwait,KWT,100000,2017
+Kyrgyz Republic,KGZ,-100001,2017
+Lao PDR,LAO,-74998,2017
+Late-demographic dividend,LTE,-1732018,2017
+Latin America & Caribbean,LCN,-1885256,2017
+Latin America & Caribbean (excluding high income),LAC,-2013808,2017
+Latin America & the Caribbean (IDA & IBRD countries),TLA,-1714758,2017
+Latvia,LVA,-359,2017
+Least developed countries: UN classification,LDC,-4127101,2017
+Lebanon,LBN,-279401,2017
+Lesotho,LSO,-19997,2017
+Liberia,LBR,-25000,2017
+Libya,LBY,-9997,2017
+Lithuania,LTU,0,2017
+Low & middle income,LMY,-13106275,2017
+Low income,LIC,-1961388,2017
+Lower middle income,LMC,-8360857,2017
+Luxembourg,LUX,25001,2017
+"Macao SAR, China",MAC,25000,2017
+"Macedonia, FYR",MKD,-4999,2017
+Madagascar,MDG,-5000,2017
+Malawi,MWI,-60000,2017
+Malaysia,MYS,250000,2017
+Maldives,MDV,-53,2017
+Mali,MLI,-200000,2017
+Malta,MLT,4823,2017
+Mauritania,MRT,-20000,2017
+Mauritius,MUS,0,2017
+Mexico,MEX,-549588,2017
+"Micronesia, Fed. Sts.",FSM,-6000,2017
+Middle East & North Africa,MEA,322043,2017
+Middle East & North Africa (excluding high income),MNA,-570783,2017
+Middle East & North Africa (IDA & IBRD countries),TMN,-537970,2017
+Middle income,MIC,-11147467,2017
+Moldova,MDA,-14318,2017
+Mongolia,MNG,-15001,2017
+Montenegro,MNE,-2412,2017
+Morocco,MAR,-310624,2017
+Mozambique,MOZ,-25000,2017
+Myanmar,MMR,-49998,2017
+Namibia,NAM,-2236,2017
+Nepal,NPL,-325121,2017
+Netherlands,NLD,110006,2017
+New Caledonia,NCL,5660,2017
+New Zealand,NZL,61999,2017
+Nicaragua,NIC,-106342,2017
+Niger,NER,-28497,2017
+Nigeria,NGA,-300000,2017
+North America,NAC,6100001,2017
+Norway,NOR,175333,2017
+OECD members,OED,10851285,2017
+Oman,OMN,-20000,2017
+Other small states,OSS,62946,2017
+Pacific island small states,PSS,-65578,2017
+Pakistan,PAK,-737826,2017
+Panama,PAN,31448,2017
+Papua New Guinea,PNG,0,2017
+Paraguay,PRY,-82365,2017
+Peru,PER,-179540,2017
+Philippines,PHL,-600000,2017
+Poland,POL,-38090,2017
+Portugal,PRT,-29136,2017
+Post-demographic dividend,PST,11860508,2017
+Pre-demographic dividend,PRE,-1742733,2017
+Puerto Rico,PRI,-70002,2017
+Qatar,QAT,100000,2017
+Romania,ROU,-218600,2017
+Russian Federation,RUS,808943,2017
+Rwanda,RWA,-44999,2017
+Samoa,WSM,-12500,2017
+Sao Tome and Principe,STP,-4999,2017
+Saudi Arabia,SAU,350000,2017
+Senegal,SEN,-99996,2017
+Serbia,SRB,-50002,2017
+Seychelles,SYC,-1551,2017
+Sierra Leone,SLE,-21000,2017
+Singapore,SGP,298448,2017
+Slovak Republic,SVK,4999,2017
+Slovenia,SVN,6002,2017
+Small states,SST,-118932,2017
+Solomon Islands,SLB,-12000,2017
+Somalia,SOM,-200000,2017
+South Africa,ZAF,200000,2017
+South Asia,SAS,-5138643,2017
+South Asia (IDA & IBRD),TSA,-5138643,2017
+South Sudan,SSD,150000,2017
+Spain,ESP,198843,2017
+Sri Lanka,LKA,-375170,2017
+St. Lucia,LCA,40,2017
+St. Vincent and the Grenadines,VCT,-3004,2017
+Sub-Saharan Africa,SSF,-1708344,2017
+Sub-Saharan Africa (excluding high income),SSA,-1706793,2017
+Sub-Saharan Africa (IDA & IBRD countries),TSS,-1708344,2017
+Sudan,SDN,-100000,2017
+Suriname,SUR,-4999,2017
+Swaziland,SWZ,-9999,2017
+Sweden,SWE,183001,2017
+Switzerland,CHE,250000,2017
+Syrian Arab Republic,SYR,940716,2017
+Tajikistan,TJK,-99999,2017
+Tanzania,TZA,-199999,2017
+Thailand,THA,97218,2017
+Timor-Leste,TLS,-50004,2017
+Togo,TGO,-9999,2017
+Tonga,TON,-4833,2017
+Trinidad and Tobago,TTO,-4501,2017
+Tunisia,TUN,-20000,2017
+Turkey,TUR,-419998,2017
+Turkmenistan,TKM,-25001,2017
+Uganda,UGA,-150000,2017
+Ukraine,UKR,-40002,2017
+United Arab Emirates,ARE,275000,2017
+United Kingdom,GBR,900000,2017
+United States,USA,5000002,2017
+Upper middle income,UMC,-2786610,2017
+Uruguay,URY,-15000,2017
+Uzbekistan,UZB,-250001,2017
+Vanuatu,VUT,603,2017
+"Venezuela, RB",VEN,-60493,2017
+Vietnam,VNM,-200000,2017
+Virgin Islands (U.S.),VIR,-1799,2017
+West Bank and Gaza,PSE,-32813,2017
+World,WLD,0,2017
+"Yemen, Rep.",YEM,-200000,2017
+Zambia,ZMB,-40000,2017
+Zimbabwe,ZWE,-163281,2017
+Afghanistan,AFG,-271105,2022
+Albania,ALB,-50002,2022
+Algeria,DZA,-50002,2022
+Angola,AGO,0,2022
+Antigua and Barbuda,ATG,-56,2022
+Arab World,ARB,1074628,2022
+Argentina,ARG,19002,2022
+Armenia,ARM,-24989,2022
+Aruba,ABW,803,2022
+Australia,AUS,751998,2022
+Austria,AUT,99999,2022
+Azerbaijan,AZE,-34001,2022
+"Bahamas, The",BHS,5372,2022
+Bahrain,BHR,17998,2022
+Bangladesh,BGD,-1583594,2022
+Barbados,BRB,1968,2022
+Belarus,BLR,10000,2022
+Belgium,BEL,119998,2022
+Belize,BLZ,6159,2022
+Benin,BEN,-10000,2022
+Bhutan,BTN,0,2022
+Bolivia,BOL,-40300,2022
+Bosnia and Herzegovina,BIH,-2506,2022
+Botswana,BWA,15000,2022
+Brazil,BRA,29853,2022
+Brunei Darussalam,BRN,1760,2022
+Bulgaria,BGR,-50000,2022
+Burkina Faso,BFA,-125000,2022
+Burundi,BDI,10003,2022
+Cabo Verde,CPV,-6218,2022
+Cambodia,KHM,-149999,2022
+Cameroon,CMR,-40000,2022
+Canada,CAN,1000002,2022
+Caribbean small states,CSS,-108109,2022
+Central African Republic,CAF,9025,2022
+Central Europe and the Baltics,CEB,-104335,2022
+Chad,TCD,70000,2022
+Channel Islands,CHI,3654,2022
+Chile,CHL,177561,2022
+China,CHN,-1500000,2022
+Colombia,COL,-147002,2022
+Comoros,COM,-10000,2022
+"Congo, Dem. Rep.",COD,0,2022
+"Congo, Rep.",COG,-10000,2022
+Costa Rica,CRI,13494,2022
+Cote d'Ivoire,CIV,30000,2022
+Croatia,HRV,-2580,2022
+Cuba,CUB,-64996,2022
+Curacao,CUW,2856,2022
+Cyprus,CYP,25000,2022
+Czech Republic,CZE,59997,2022
+Denmark,DNK,75998,2022
+Djibouti,DJI,-8997,2022
+Dominican Republic,DOM,-147671,2022
+Early-demographic dividend,EAR,-6988849,2022
+East Asia & Pacific,EAS,-1267745,2022
+East Asia & Pacific (excluding high income),EAP,-2858384,2022
+East Asia & Pacific (IDA & IBRD countries),TEA,-2858384,2022
+Ecuador,ECU,-24056,2022
+"Egypt, Arab Rep.",EGY,-215681,2022
+El Salvador,SLV,-170327,2022
+Equatorial Guinea,GNQ,20000,2022
+Eritrea,ERI,-34998,2022
+Estonia,EST,-4999,2022
+Ethiopia,ETH,-60001,2022
+Euro area,EMU,2526978,2022
+Europe & Central Asia,ECS,2604954,2022
+Europe & Central Asia (excluding high income),ECA,-1400112,2022
+Europe & Central Asia (IDA & IBRD countries),TEC,-1438202,2022
+European Union,EUU,3526622,2022
+Fiji,FJI,-28720,2022
+Finland,FIN,58003,2022
+Fragile and conflict affected situations,FCS,705785,2022
+France,FRA,400002,2022
+French Polynesia,PYF,-5000,2022
+Gabon,GAB,5000,2022
+"Gambia, The",GMB,-13000,2022
+Georgia,GEO,-50000,2022
+Germany,DEU,750000,2022
+Ghana,GHA,-100000,2022
+Greece,GRC,49996,2022
+Grenada,GRD,-2997,2022
+Guam,GUM,0,2022
+Guatemala,GTM,-71678,2022
+Guinea,GIN,-10000,2022
+Guinea-Bissau,GNB,-10000,2022
+Guyana,GUY,-22097,2022
+Haiti,HTI,-175000,2022
+Heavily indebted poor countries (HIPC),HPC,-2079649,2022
+High income,HIC,12343865,2022
+Honduras,HND,-48782,2022
+"Hong Kong SAR, China",HKG,150000,2022
+Hungary,HUN,29999,2022
+Iceland,ISL,1902,2022
+India,IND,-1858483,2022
+Indonesia,IDN,-700000,2022
+"Iran, Islamic Rep.",IRN,-117233,2022
+Iraq,IRQ,-104145,2022
+Ireland,IRL,50002,2022
+Israel,ISR,50002,2022
+Italy,ITA,528268,2022
+Jamaica,JAM,-84999,2022
+Japan,JPN,250000,2022
+Jordan,JOR,-394312,2022
+Kazakhstan,KAZ,0,2022
+Kenya,KEN,-50000,2022
+Kiribati,KIR,-2129,2022
+"Korea, Dem. People’s Rep.",PRK,0,2022
+"Korea, Rep.",KOR,200000,2022
+Kuwait,KWT,70000,2022
+Kyrgyz Republic,KGZ,-100001,2022
+Lao PDR,LAO,-74998,2022
+Late-demographic dividend,LTE,-2503760,2022
+Latin America & Caribbean,LCN,-1699951,2022
+Latin America & Caribbean (excluding high income),LAC,-1807659,2022
+Latin America & the Caribbean (IDA & IBRD countries),TLA,-1584156,2022
+Latvia,LVA,-359,2022
+Least developed countries: UN classification,LDC,-4174973,2022
+Lebanon,LBN,-770137,2022
+Lesotho,LSO,-19997,2022
+Liberia,LBR,-25000,2022
+Libya,LBY,20001,2022
+Lithuania,LTU,0,2022
+Low & middle income,LMY,-12362842,2022
+Low income,LIC,-2040746,2022
+Lower middle income,LMC,-6198795,2022
+Luxembourg,LUX,25001,2022
+"Macao SAR, China",MAC,25000,2022
+"Macedonia, FYR",MKD,-4999,2022
+Madagascar,MDG,-5000,2022
+Malawi,MWI,-60000,2022
+Malaysia,MYS,250000,2022
+Maldives,MDV,-53,2022
+Mali,MLI,-200000,2022
+Malta,MLT,3999,2022
+Mauritania,MRT,-20000,2022
+Mauritius,MUS,0,2022
+Mexico,MEX,-563587,2022
+"Micronesia, Fed. Sts.",FSM,-5000,2022
+Middle East & North Africa,MEA,1236396,2022
+Middle East & North Africa (excluding high income),MNA,594397,2022
+Middle East & North Africa (IDA & IBRD countries),TMN,619397,2022
+Middle income,MIC,-10324676,2022
+Moldova,MDA,-14318,2022
+Mongolia,MNG,-15001,2022
+Montenegro,MNE,-2412,2022
+Morocco,MAR,-300001,2022
+Mozambique,MOZ,-25000,2022
+Myanmar,MMR,-50000,2022
+Namibia,NAM,-2236,2022
+Nepal,NPL,-325542,2022
+Netherlands,NLD,110006,2022
+New Caledonia,NCL,5660,2022
+New Zealand,NZL,61999,2022
+Nicaragua,NIC,-80154,2022
+Niger,NER,-28497,2022
+Nigeria,NGA,-300000,2022
+North America,NAC,6000004,2022
+Norway,NOR,115003,2022
+OECD members,OED,9904392,2022
+Oman,OMN,-50000,2022
+Other small states,OSS,21440,2022
+Pacific island small states,PSS,-64626,2022
+Pakistan,PAK,-732415,2022
+Panama,PAN,28882,2022
+Papua New Guinea,PNG,0,2022
+Paraguay,PRY,-76682,2022
+Peru,PER,-128859,2022
+Philippines,PHL,-400000,2022
+Poland,POL,-38090,2022
+Portugal,PRT,26926,2022
+Post-demographic dividend,PST,11407007,2022
+Pre-demographic dividend,PRE,-1937712,2022
+Puerto Rico,PRI,-59999,2022
+Qatar,QAT,75000,2022
+Romania,ROU,-109304,2022
+Russian Federation,RUS,500002,2022
+Rwanda,RWA,-44999,2022
+Samoa,WSM,-12500,2022
+Sao Tome and Principe,STP,-4753,2022
+Saudi Arabia,SAU,200000,2022
+Senegal,SEN,-99996,2022
+Serbia,SRB,-50002,2022
+Seychelles,SYC,-1551,2022
+Sierra Leone,SLE,-30000,2022
+Singapore,SGP,149222,2022
+Slovak Republic,SVK,4999,2022
+Slovenia,SVN,6002,2022
+Small states,SST,-151295,2022
+Solomon Islands,SLB,-12000,2022
+Somalia,SOM,-150000,2022
+South Africa,ZAF,100000,2022
+South Asia,SAS,-5146362,2022
+South Asia (IDA & IBRD),TSA,-5146362,2022
+South Sudan,SSD,50000,2022
+Spain,ESP,274135,2022
+Sri Lanka,LKA,-375170,2022
+St. Lucia,LCA,40,2022
+St. Vincent and the Grenadines,VCT,-2502,2022
+Sub-Saharan Africa,SSF,-1748853,2022
+Sub-Saharan Africa (excluding high income),SSA,-1747302,2022
+Sub-Saharan Africa (IDA & IBRD countries),TSS,-1748853,2022
+Sudan,SDN,-45000,2022
+Suriname,SUR,-4999,2022
+Swaziland,SWZ,-9999,2022
+Sweden,SWE,183001,2022
+Switzerland,CHE,200000,2022
+Syrian Arab Republic,SYR,2779904,2022
+Tajikistan,TJK,-99999,2022
+Tanzania,TZA,-199999,2022
+Thailand,THA,96244,2022
+Timor-Leste,TLS,-50004,2022
+Togo,TGO,-9996,2022
+Tonga,TON,-4880,2022
+Trinidad and Tobago,TTO,-3998,2022
+Tunisia,TUN,-20000,2022
+Turkey,TUR,-999997,2022
+Turkmenistan,TKM,-25001,2022
+Uganda,UGA,-150000,2022
+Ukraine,UKR,-40002,2022
+United Arab Emirates,ARE,275000,2022
+United Kingdom,GBR,850623,2022
+United States,USA,5000002,2022
+Upper middle income,UMC,-4125881,2022
+Uruguay,URY,-15000,2022
+Uzbekistan,UZB,-250001,2022
+Vanuatu,VUT,603,2022
+"Venezuela, RB",VEN,-48401,2022
+Vietnam,VNM,-200000,2022
+Virgin Islands (U.S.),VIR,-1799,2022
+West Bank and Gaza,PSE,-25000,2022
+World,WLD,0,2022
+"Yemen, Rep.",YEM,-200000,2022
+Zambia,ZMB,-40000,2022
+Zimbabwe,ZWE,-106641,2022

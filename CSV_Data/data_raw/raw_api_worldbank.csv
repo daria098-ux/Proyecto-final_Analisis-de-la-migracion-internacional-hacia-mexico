@@ -1,0 +1,181 @@
+iso,pais,anio,migracion_neta
+MX,Mexico,2023,-101044
+MX,Mexico,2022,-108438
+MX,Mexico,2021,-122791
+MX,Mexico,2020,-147456
+MX,Mexico,2019,-169628
+MX,Mexico,2018,-175356
+MX,Mexico,2017,-227499
+MX,Mexico,2016,-304472
+MX,Mexico,2015,-291044
+US,United States,2023,1322668
+US,United States,2022,1319009
+US,United States,2021,674787
+US,United States,2020,329769
+US,United States,2019,1774500
+US,United States,2018,1764961
+US,United States,2017,1864738
+US,United States,2016,1889129
+US,United States,2015,1722127
+GT,Guatemala,2023,-8940
+GT,Guatemala,2022,-8463
+GT,Guatemala,2021,-29908
+GT,Guatemala,2020,-23927
+GT,Guatemala,2019,-57746
+GT,Guatemala,2018,-56487
+GT,Guatemala,2017,-42779
+GT,Guatemala,2016,-30980
+GT,Guatemala,2015,-48179
+HN,Honduras,2023,-5044
+HN,Honduras,2022,-5374
+HN,Honduras,2021,-5777
+HN,Honduras,2020,-6199
+HN,Honduras,2019,-6546
+HN,Honduras,2018,-6764
+HN,Honduras,2017,-6778
+HN,Honduras,2016,-6681
+HN,Honduras,2015,-6509
+SV,El Salvador,2023,-23253
+SV,El Salvador,2022,-23255
+SV,El Salvador,2021,-27343
+SV,El Salvador,2020,-25213
+SV,El Salvador,2019,-55144
+SV,El Salvador,2018,-54163
+SV,El Salvador,2017,-50608
+SV,El Salvador,2016,-47491
+SV,El Salvador,2015,-51278
+VE,"Venezuela, RB",2023,-112899
+VE,"Venezuela, RB",2022,-141107
+VE,"Venezuela, RB",2021,-332936
+VE,"Venezuela, RB",2020,-524649
+VE,"Venezuela, RB",2019,-975534
+VE,"Venezuela, RB",2018,-1355602
+VE,"Venezuela, RB",2017,-817376
+VE,"Venezuela, RB",2016,-283270
+VE,"Venezuela, RB",2015,-77417
+CO,Colombia,2023,154521
+CO,Colombia,2022,183180
+CO,Colombia,2021,199070
+CO,Colombia,2020,227130
+CO,Colombia,2019,396826
+CO,Colombia,2018,495524
+CO,Colombia,2017,431072
+CO,Colombia,2016,104373
+CO,Colombia,2015,-41123
+CU,Cuba,2023,-22797
+CU,Cuba,2022,-23149
+CU,Cuba,2021,-11976
+CU,Cuba,2020,-11976
+CU,Cuba,2019,-23955
+CU,Cuba,2018,-23779
+CU,Cuba,2017,-23394
+CU,Cuba,2016,-24146
+CU,Cuba,2015,-24910
+HT,Haiti,2023,-31786
+HT,Haiti,2022,-32220
+HT,Haiti,2021,-32952
+HT,Haiti,2020,-33850
+HT,Haiti,2019,-34612
+HT,Haiti,2018,-34976
+HT,Haiti,2017,-34742
+HT,Haiti,2016,-33879
+HT,Haiti,2015,-32669
+NI,Nicaragua,2023,-7996
+NI,Nicaragua,2022,-7996
+NI,Nicaragua,2021,-10383
+NI,Nicaragua,2020,-10383
+NI,Nicaragua,2019,-19730
+NI,Nicaragua,2018,-20742
+NI,Nicaragua,2017,-21849
+NI,Nicaragua,2016,-23076
+NI,Nicaragua,2015,-24353
+EC,Ecuador,2023,-21948
+EC,Ecuador,2022,-23090
+EC,Ecuador,2021,-28503
+EC,Ecuador,2020,-10320
+EC,Ecuador,2019,54921
+EC,Ecuador,2018,95482
+EC,Ecuador,2017,53707
+EC,Ecuador,2016,35461
+EC,Ecuador,2015,14724
+PE,Peru,2023,24783
+PE,Peru,2022,33982
+PE,Peru,2021,41868
+PE,Peru,2020,55375
+PE,Peru,2019,74270
+PE,Peru,2018,339067
+PE,Peru,2017,114382
+PE,Peru,2016,96740
+PE,Peru,2015,2421
+BO,Bolivia,2023,-3008
+BO,Bolivia,2022,-3008
+BO,Bolivia,2021,-4663
+BO,Bolivia,2020,-4663
+BO,Bolivia,2019,-8981
+BO,Bolivia,2018,-9344
+BO,Bolivia,2017,-9669
+BO,Bolivia,2016,-10071
+BO,Bolivia,2015,-10525
+BR,Brazil,2023,-240059
+BR,Brazil,2022,-253639
+BR,Brazil,2021,-208581
+BR,Brazil,2020,-78437
+BR,Brazil,2019,-129216
+BR,Brazil,2018,-230334
+BR,Brazil,2017,-156296
+BR,Brazil,2016,-92989
+BR,Brazil,2015,-173611
+AR,Argentina,2023,4133
+AR,Argentina,2022,5589
+AR,Argentina,2021,314
+AR,Argentina,2020,292
+AR,Argentina,2019,5397
+AR,Argentina,2018,5742
+AR,Argentina,2017,4931
+AR,Argentina,2016,5215
+AR,Argentina,2015,5464
+DO,Dominican Republic,2023,-34915
+DO,Dominican Republic,2022,-35153
+DO,Dominican Republic,2021,-17957
+DO,Dominican Republic,2020,-17957
+DO,Dominican Republic,2019,-35797
+DO,Dominican Republic,2018,-35934
+DO,Dominican Republic,2017,-36069
+DO,Dominican Republic,2016,-36219
+DO,Dominican Republic,2015,-36375
+JM,Jamaica,2023,-10003
+JM,Jamaica,2022,-10003
+JM,Jamaica,2021,-4665
+JM,Jamaica,2020,0
+JM,Jamaica,2019,-10335
+JM,Jamaica,2018,-10335
+JM,Jamaica,2017,-10335
+JM,Jamaica,2016,-10335
+JM,Jamaica,2015,-10335
+PY,Paraguay,2023,-12500
+PY,Paraguay,2022,-12500
+PY,Paraguay,2021,-8226
+PY,Paraguay,2020,-8226
+PY,Paraguay,2019,-16263
+PY,Paraguay,2018,-16472
+PY,Paraguay,2017,-16630
+PY,Paraguay,2016,-16737
+PY,Paraguay,2015,-16834
+UY,Uruguay,2023,-1501
+UY,Uruguay,2022,-1501
+UY,Uruguay,2021,-1482
+UY,Uruguay,2020,-1482
+UY,Uruguay,2019,-2899
+UY,Uruguay,2018,-2963
+UY,Uruguay,2017,-3091
+UY,Uruguay,2016,-3506
+UY,Uruguay,2015,-4157
+PA,Panama,2023,7262
+PA,Panama,2022,7967
+PA,Panama,2021,5473
+PA,Panama,2020,5473
+PA,Panama,2019,10623
+PA,Panama,2018,11130
+PA,Panama,2017,11059
+PA,Panama,2016,10109
+PA,Panama,2015,8648
