@@ -143,3 +143,217 @@ def limpiar_unhcr():
     print(f"Duplicados eliminados:{antes - len(df)}")
     print(f"Registros limpios:{len(df)}")
     return guardar(df,"clean_unhcr.csv")
+
+def limpiar_inegi():
+    print("\n" + "=" * 55)
+    print("Limpiando INEGI ENADID 2023 de TMIGRANTE")
+    print("=" * 55)
+    df = leer_raw("raw_csv_inegi.csv")
+    if df.empty:
+        return df
+    print(f"Registros crudos:{len(df)}")
+    mapa_sexo = {1: "Male", 2: "Female"}
+    if "sex" in df.columns:
+        df["sex"] = df["sex"].astype(str).str.strip()
+        mapa_sexo_num = {"1": "Male", "2": "Female"}
+        df["sex"] = df["sex"].replace(mapa_sexo_num)
+        df["sex"] = df["sex"].where(df["sex"].isin(["Male", "Female", "Other"]), "Other")
+    else:
+        df["age"] = 28
+
+    def convertir_anio(x):
+        try:
+            x = int(x)
+        except (ValueError, TypeError):
+            return None
+        if x in [999, 99, 0]:
+            return None
+        if x <= 24:
+            return 2000 + x
+        elif x <= 98:
+            return 1900 + x
+        return None
+
+    if "year" in df.columns:
+        df["year"] = df["year"].apply(convertir_anio)
+    df = df[df["year"].between(2015, 2024)].copy()
+    df["year"] = df["year"].astype(int)
+    df["origin_country"] = "Mexico"
+    mapa_paises_inegi = {
+        101: "Mexico", 201: "Guatemala", 202: "Belize", 203: "Honduras",
+        204: "El Salvador", 205: "Nicaragua", 206: "Costa Rica", 207: "Panama",
+        301: "United States", 302: "Canada", 303: "Puerto Rico", 401: "Cuba",
+        403: "Dominican Republic", 408: "Haiti", 413: "Jamaica", 415: "Trinidad and Tobago",
+        416: "Barbados", 418: "Other Caribbean", 419: "Bahamas", 424: "Aruba",
+        501: "Colombia", 502: "Venezuela", 503: "Guyana", 504: "Ecuador",
+        505: "Peru", 506: "Bolivia", 507: "Chile", 508: "Argentina",
+        509: "Uruguay", 510: "Paraguay", 511: "Brazil", 221: "Other Central America",
+    }
+    if "destination_country_code" in df.columns:
+        df["destination_country"] = (df["destination_country_code"].map(mapa_paises_inegi).fillna("Other"))
+    elif "destination_country" not in df.columns:
+        df["destination_country"] = "Other"
+
+    # validar motivo
+    if "motive" in df.columns:
+        df["motive"] = df["motive"].astype(str).str.strip().replace("nan", "Other")
+
+    categorias_validas = ["Economic", "Political", "Security", "Social", "Other"]
+    if "category" in df.columns:
+        df["category"] = df["category"].astype(str).str.strip()
+        df["category"] = df["category"].where(df["category"].isin(categorias_validas), "Social")
+
+    # validar status
+    status_validos = ["In transit", "Established", "Returned", "Deported"]
+    if "status" in df.columns:
+        df["status"] = df["status"].astype(str).str.strip()
+        df["status"] = df["status"].where(df["status"].isin(status_validos), "Established")
+
+    # validar nivel socioeconomico
+    niveles_validos = ["Low", "Lower-Middle", "Middle", "Upper-Middle", "High"]
+    if "socioeconomic_level" in df.columns:
+        df["socioeconomic_level"] = df["socioeconomic_level"].astype(str).str.strip()
+        df["socioeconomic_level"] = df["socioeconomic_level"].where(df["socioeconomic_level"].isin(niveles_validos), "Middle")
+
+    cols_finales = ["age", "sex", "origin_country", "destination_country", "motive", "category", "year", "socioeconomic_level", "status"]
+    cols_finales = [c for c in cols_finales if c in df.columns]
+    df = df[cols_finales].copy()
+
+    antes = len(df)
+    df = df.dropna(subset=["origin_country", "year"])
+    print(f"Nulos eliminados:{antes - len(df)}")
+    antes = len(df)
+    df = df.drop_duplicates().reset_index(drop=True)
+    print(f"Duplicados eliminados:{antes - len(df)}")
+    print(f"Registros limpios:{len(df)}")
+    return guardar(df, "clean_inegi.csv")
+
+def limpiar_missing():
+    print("\n" + "=" * 55)
+    print("Limpiando Global Missing Migrants Dataset")
+    print("=" * 55)
+    df = leer_raw("raw_csv_missing.csv")
+    if df.empty:
+        return df
+    print(f"  Registros crudos:{len(df)}")
+
+    df["Incident year"] = pd.to_numeric(df["Incident year"], errors="coerce")
+
+    cols_num = ["Number of Dead", "Total Number of Dead and Missing",
+                "Number of Survivors", "Number of Females", "Number of Males", "Number of Children",
+                "Minimum Estimated Number of Missing"]
+    for col in cols_num:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0).astype(int)
+
+    df = df[df["Incident year"].between(2014, 2024)].copy()
+
+    cols_texto = ["Cause of Death", "Migration route", "Region of Incident", "Country of Origin", "Region of Origin", "UNSD Geographical Grouping"]
+    for col in cols_texto:
+        if col in df.columns:
+            df[col] = df[col].astype(str).str.strip().replace("nan", "Unknown")
+
+    causas = df["Cause of Death"].dropna().unique()
+    riesgos_reales = []
+    for causa in causas:
+        if causa in ["Unknown", "nan"] or not causa:
+            continue
+        causa_lower = causa.lower()
+        if any(p in causa_lower for p in ["drown", "water", "vehicle", "accident", "exposure", "heat", "hypotherm"]):
+            tipo = "Physical"
+        elif any(p in causa_lower for p in ["shoot", "violen", "attack", "murder", "assault"]):
+            tipo = "Physical"
+        elif any(p in causa_lower for p in ["detain", "deport", "legal"]):
+            tipo = "Legal"
+        elif any(p in causa_lower for p in ["exploit", "labour", "work"]):
+            tipo = "Economic"
+        else:
+            tipo = "Physical"
+        riesgos_reales.append({"description": causa, "type": tipo})
+
+    df_riesgos = pd.DataFrame(riesgos_reales).drop_duplicates(subset=["description"])
+    guardar(df_riesgos, "clean_riesgos_missing.csv")
+    print(f"Causas únicas extraídas como riesgos:{len(df_riesgos)}")
+
+    antes = len(df)
+    df = df.dropna(subset=["Incident year"]).drop_duplicates().reset_index(drop=True)
+    print(f"Duplicados eliminados:{antes - len(df)}")
+    print(f"Registros limpios:{len(df)}")
+    return guardar(df, "clean_missing.csv")
+
+def generar_catalogos():
+    print("\n" + "=" * 55)
+    print("Generando catálogos estáticos")
+    print("=" * 55)
+    guardar(pd.DataFrame({"year": list(range(2015, 2025))}), "clean_periodos.csv")
+    guardar(pd.DataFrame({"description": ["Low", "Lower-Middle", "Middle", "Upper-Middle", "High"]}), "clean_niveles.csv")
+    guardar(pd.DataFrame({"name": ["Economic", "Political", "Security", "Social"]}), "clean_categorias.csv")
+
+    motivos = [
+        {"name": "Job search", "category": "Economic"}, {"name": "Better quality of life", "category": "Economic"},
+        {"name": "Extreme poverty", "category": "Economic"}, {"name": "Political persecution", "category": "Political"},
+        {"name": "Armed conflict", "category": "Political"}, {"name": "Lack of freedoms", "category": "Political"},
+        {"name": "Violence or insecurity", "category": "Security"}, {"name": "Organized crime violence", "category": "Security"},
+        {"name": "Direct threats", "category": "Security"}, {"name": "Family reunification", "category": "Social"},
+        {"name": "Access to education", "category": "Social"}, {"name": "Access to healthcare", "category": "Social"},
+        {"name": "Other", "category": "Social"}, {"name": "Not specified", "category": "Social"},
+    ]
+    guardar(pd.DataFrame(motivos), "clean_motivos.csv")
+
+    riesgos = [
+        {"description": "Dangerous border crossings", "type": "Physical"}, {"description": "Dehydration and heat exposure", "type": "Physical"},
+        {"description": "Drowning", "type": "Physical"}, {"description": "Immigration detention", "type": "Legal"},
+        {"description": "Deportation", "type": "Legal"}, {"description": "Labor exploitation", "type": "Economic"},
+        {"description": "Extortion by criminal groups", "type": "Economic"}, {"description": "Discrimination and xenophobia", "type": "Social"},
+        {"description": "Family separation", "type": "Social"},
+    ]
+    guardar(pd.DataFrame(riesgos), "clean_riesgos.csv")
+
+    impactos = [
+        {"type": "Social", "description": "Increased demand for healthcare services"},
+        {"type": "Social", "description": "Greater cultural diversity in host communities"},
+        {"type": "Social", "description": "Pressure on local education systems"},
+        {"type": "Economic", "description": "Labor force contribution to productive sectors"},
+        {"type": "Economic", "description": "Remittances sent to countries of origin"},
+        {"type": "Economic", "description": "Increased housing demand"},
+    ]
+    guardar(pd.DataFrame(impactos), "clean_impactos.csv")
+    print("Catálogos generados.")
+
+def resumen():
+    print("\n" + "=" * 55)
+    print("RESUMEN de la FASE 2")
+    print("=" * 55)
+    archivos = [
+        ("clean_paises.csv", "regions, countries"),
+        ("clean_estadisticas.csv", "global_statistics"),
+        ("clean_undesa_completo.csv", "global_statistics (extra)"),
+        ("clean_unhcr.csv", "global_statistics (asilo)"),
+        ("clean_inegi.csv", "migrants, migrations"),
+        ("clean_missing.csv", "migration_risk"),
+        ("clean_riesgos_missing.csv", "risks (causas reales)"),
+        ("clean_periodos.csv", "periods"),
+        ("clean_niveles.csv", "socioeconomic_levels"),
+        ("clean_categorias.csv", "motive_categories"),
+        ("clean_motivos.csv", "motives"),
+        ("clean_riesgos.csv", "risks (catálogo base)"),
+        ("clean_impactos.csv", "impacts"),
+    ]
+    for archivo, tabla in archivos:
+        ruta = f"{CARPETA_CLEAN}/{archivo}"
+        if os.path.exists(ruta):
+            n = len(pd.read_csv(ruta))
+            print(f"  {archivo:<35} {tabla:<30}: {n:>6} registros")
+        else:
+            print(f"  {archivo:<35} {tabla:<30}: no generado")
+    print(f"\n  Archivos en : ./{CARPETA_CLEAN}/")
+
+if __name__ == "__main__":
+    print("\n🔄FASE 2 TRANSFORMACIÓN Y LIMPIEZA\n")
+    limpiar_paises()
+    limpiar_estadisticas()
+    limpiar_unhcr()
+    limpiar_inegi()
+    limpiar_missing()
+    generar_catalogos()
+    resumen()
