@@ -4,26 +4,26 @@ import os
 
 
 BASE_DIR    = os.path.dirname(os.path.abspath(__file__))
-CARPETA_RAW = os.path.join(BASE_DIR, "data_raw")
-os.makedirs(CARPETA_RAW, exist_ok=True)
+RAW_FOLDER = os.path.join(BASE_DIR, "data_raw")
+os.makedirs(RAW_FOLDER, exist_ok=True)
 
 
-ARCHIVO_UNDESA   = os.path.join(BASE_DIR, "cleaned_undesa_2024_ims_stock_by_sex_destination_and_origin_1990-2024.csv")
-ARCHIVO_WORLDPOP = os.path.join(BASE_DIR, "world_pop_mig_186_countries.csv")
-ARCHIVO_MISSING  = os.path.join(BASE_DIR, "Global_Missing_Migrants_Dataset.csv")
-ARCHIVO_WB_DATA  = os.path.join(BASE_DIR, "data.csv")
-ARCHIVO_INEGI    = os.path.join(BASE_DIR, "TMIGRANTE.csv")
+UNDESA_FILE   = os.path.join(BASE_DIR, "cleaned_undesa_2024_ims_stock_by_sex_destination_and_origin_1990-2024.csv")
+WORLDPOP_FILE = os.path.join(BASE_DIR, "world_pop_mig_186_countries.csv")
+MISSING_FILE  = os.path.join(BASE_DIR, "Global_Missing_Migrants_Dataset.csv")
+WB_DATA_FILE  = os.path.join(BASE_DIR, "data.csv")
+INEGI_FILE    = os.path.join(BASE_DIR, "TMIGRANTE.csv")
 
 
-MAX_PAGINAS_UNHCR = 50
+MAX_UNHCR_PAGES = 50
 
 
 
 
-def _detectar_encoding(ruta, candidatos=("utf-16", "utf-8-sig", "utf-8", "latin-1")):
-   for enc in candidatos:
+def _detect_encoding(path, candidates=("utf-16", "utf-8-sig", "utf-8", "latin-1")):
+   for enc in candidates:
        try:
-           with open(ruta, encoding=enc) as f:
+           with open(path, encoding=enc) as f:
                f.read(2048)
            return enc
        except (UnicodeDecodeError, UnicodeError):
@@ -33,53 +33,53 @@ def _detectar_encoding(ruta, candidatos=("utf-16", "utf-8-sig", "utf-8", "latin-
 
 
 
-# SECCION de: APIs
+# SECTION: APIs
 
 
-def extraer_api_paises():
+def extract_countries_api():
    print("=" * 55)
-   print("[API 1] REST Countries informacion de paises")
+   print("[API 1] REST Countries - country information")
    print("=" * 55)
-   paises_iso = [
+   country_codes = [
        "MX", "US", "GT", "HN", "SV", "VE", "CO",
        "CU", "HT", "NI", "EC", "PE", "BO", "BR",
        "AR", "DO", "JM", "PY", "UY", "PA",]
-   registros = []
-   for iso in paises_iso:
+   records = []
+   for iso in country_codes:
        url = f"https://restcountries.com/v3.1/alpha/{iso}"
        try:
            resp = requests.get(url, timeout=10)
            if resp.status_code == 200:
                info = resp.json()[0]
-               registros.append({
+               records.append({
                    "iso":    iso,
-                   "nombre": info["name"]["common"],
+                   "name": info["name"]["common"],
                    "region": info.get("region", "Unknown"),})
                print(f"✔️{iso} — {info['name']['common']}")
            else:
                print(f"❌{iso} — HTTP {resp.status_code}")
        except Exception as e:
            print(f"❌{iso} — Error: {e}")
-   df   = pd.DataFrame(registros)
-   ruta = os.path.join(CARPETA_RAW, "raw_api_paises.csv")
-   df.to_csv(ruta, index=False, encoding="utf-8")
-   print(f"\nGuardado: {ruta} ({len(df)} registros)\n")
+   df   = pd.DataFrame(records)
+   path = os.path.join(RAW_FOLDER, "raw_api_countries.csv")
+   df.to_csv(path, index=False, encoding="utf-8")
+   print(f"\nSaved: {path} ({len(df)} records)\n")
    return df
 
 
 
 
-def extraer_api_worldbank():
+def extract_worldbank_api():
    print("=" * 55)
-   print("[API 2] World Bank migracion neta")
+   print("[API 2] World Bank - net migration")
    print("=" * 55)
-   paises_iso = ["MX", "US", "GT", "HN", "SV", "VE", "CO",
+   country_codes = ["MX", "US", "GT", "HN", "SV", "VE", "CO",
                  "CU", "HT", "NI", "EC", "PE", "BO", "BR",
                  "AR", "DO", "JM", "PY", "UY", "PA",]
-   anio_inicio = 2015
-   anio_fin    = 2023
-   registros   = []
-   for iso in paises_iso:
+   start_year = 2015
+   end_year    = 2023
+   records   = []
+   for iso in country_codes:
        url = (
            f"https://api.worldbank.org/v2/country/{iso}"
            f"/indicator/SM.POP.NETM"
@@ -91,36 +91,36 @@ def extraer_api_worldbank():
                data = resp.json()
                if data and len(data) > 1 and data[1]:
                    for item in data[1]:
-                       anio  = int(item["date"])
-                       valor = item.get("value")
-                       if valor is not None and anio_inicio <= anio <= anio_fin:
-                           registros.append({
+                       year  = int(item["date"])
+                       value = item.get("value")
+                       if value is not None and start_year <= year <= end_year:
+                           records.append({
                                "iso":            iso,
-                               "pais":           item["country"]["value"],
-                               "anio":           anio,
-                               "migracion_neta": int(round(float(valor))),})
+                               "country":           item["country"]["value"],
+                               "year":           year,
+                               "net_migration": int(round(float(value))),})
                    print(f"✔️{iso}")
                else:
-                   print(f"❌{iso} sin datos")
+                   print(f"❌{iso} no data")
            else:
                print(f"❌{iso} HTTP {resp.status_code}")
        except Exception as e:
            print(f"❌{iso} Error: {e}")
-   df   = pd.DataFrame(registros)
-   ruta = os.path.join(CARPETA_RAW, "raw_api_worldbank.csv")
-   df.to_csv(ruta, index=False, encoding="utf-8")
-   print(f"\nGuardado: {ruta} ({len(df)} registros)\n")
+   df   = pd.DataFrame(records)
+   path = os.path.join(RAW_FOLDER, "raw_api_worldbank.csv")
+   df.to_csv(path, index=False, encoding="utf-8")
+   print(f"\nSaved: {path} ({len(df)} records)\n")
    return df
 
 
 
 
-def extraer_api_unhcr():
+def extract_unhcr_api():
    print("=" * 55)
-   print("[API 3] UNHCR demografia migrantes en Mexico por pais")
+   print("[API 3] UNHCR - migrant demographics in Mexico by country")
    print("=" * 55)
    url = "https://api.unhcr.org/population/v1/demographics/"
-   paises_coo = {
+   origin_countries = {
        "GTM": "Guatemala",        "HND": "Honduras",           "SLV": "El Salvador",
        "VEN": "Venezuela",        "CUB": "Cuba",               "HTI": "Haiti",
        "NIC": "Nicaragua",        "ECU": "Ecuador",            "COL": "Colombia",
@@ -130,33 +130,33 @@ def extraer_api_unhcr():
        "SYR": "Syria",            "AFG": "Afghanistan",        "CMR": "Cameroon",
        "SOM": "Somalia",          "YEM": "Yemen",              "COD": "Dem. Rep. Congo",
        "ETH": "Ethiopia"}
-   registros = []
-   for iso3, nombre in paises_coo.items():
-       pagina     = 1
-       total_pais = 0
-       while pagina <= MAX_PAGINAS_UNHCR:
+   records = []
+   for iso3, name in origin_countries.items():
+       page     = 1
+       total_country = 0
+       while page <= MAX_UNHCR_PAGES:
            params = {
                "coa":      "MEX",
                "coo":      iso3,
                "yearFrom": 2015,
                "yearTo":   2023,
                "limit":    300,
-               "page":     pagina,}
+               "page":     page,}
            try:
                resp = requests.get(url, params=params, timeout=15)
                if resp.status_code != 200:
-                   print(f"❌ {iso3} pag.{pagina} HTTP {resp.status_code}")
+                   print(f"❌ {iso3} p.{page} HTTP {resp.status_code}")
                    break
                data  = resp.json()
                items = data.get("items", [])
                if not items:
                    break
                for item in items:
-                   registros.append({
-                       "anio":         item.get("year"),
-                       "pais_origen":  item.get("coo_name", nombre),
-                       "iso_origen":   item.get("coo",      iso3),
-                       "pais_destino": item.get("coa_name", "Mexico"),
+                   records.append({
+                       "year":           item.get("year"),
+                       "origin_country": item.get("coo_name", name),
+                       "origin_iso":     item.get("coo",      iso3),
+                       "destination_country": item.get("coa_name", "Mexico"),
                        "f_0_4":        item.get("f_0_4",   0),
                        "f_5_11":       item.get("f_5_11",  0),
                        "f_12_17":      item.get("f_12_17", 0),
@@ -170,20 +170,20 @@ def extraer_api_unhcr():
                        "m_60":         item.get("m_60",    0),
                        "m_total":      item.get("m_total", 0),
                        "total":        item.get("total",   0),})
-               total_pais += len(items)
-               max_paginas = data.get("maxPages", 1)
-               if pagina >= max_paginas:
+               total_country += len(items)
+               max_pages = data.get("maxPages", 1)
+               if page >= max_pages:
                    break
-               pagina += 1
+               page += 1
            except Exception as e:
-               print(f"❌ {iso3} pag.{pagina} error: {e}")
+               print(f"❌ {iso3} p.{page} error: {e}")
                break
-       if total_pais > 0:
-           print(f"✔️{nombre:<22} y {total_pais} registros")
+       if total_country > 0:
+           print(f"✔️{name:<22} - {total_country} records")
        else:
-           print(f"{nombre:<22} sin datos")
-   df   = pd.DataFrame(registros)
-   ruta = os.path.join(CARPETA_RAW, "raw_api_unhcr.csv")
-   df.to_csv(ruta, index=False, encoding="utf-8")
-   print(f"\nGuardado: {ruta} ({len(df)} registros)\n")
+           print(f"{name:<22} no data")
+   df   = pd.DataFrame(records)
+   path = os.path.join(RAW_FOLDER, "raw_api_unhcr.csv")
+   df.to_csv(path, index=False, encoding="utf-8")
+   print(f"\nSaved: {path} ({len(df)} records)\n")
    return df
