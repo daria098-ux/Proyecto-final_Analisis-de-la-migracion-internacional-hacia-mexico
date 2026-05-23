@@ -1,361 +1,269 @@
-import pandas as pd
+import os
+import warnings
 import mysql.connector
 from mysql.connector import Error
-import os
-# Configurar Entorno
-DB_CONFIG = {
-  "host":     "localhost",
-  "user":     "root",
-  "password": "12345678",
-  "database": "mexico_migration",
-  "port":     3306}
+import pandas as pd
 
+DB_CONFIG = {"host": "localhost","user": "root","password": "Yaquelin09/",
+             "database": "mexico_migration2","port": 3307,}
 CARPETA_CLEAN = "data_clean"
-# Conexión
+
 def conectar():
-  try:
-      conn = mysql.connector.connect(**DB_CONFIG)
-      print("✔️  Conexión a MySQL exitosa")
-      return conn
-  except Error as e:
-      print(f"❌  Error de conexión: {e}")
-      return None
-
+    try:
+        conn = mysql.connector.connect(**DB_CONFIG)
+        print("✔️  Conexión a MySQL exitosa")
+        return conn
+    except Error as e:
+        print(f"❌  Error de conexión: {e}")
+        return None
 def desconectar(conn):
-  if conn and conn.is_connected():
-      conn.close()
-# Helpers
+    if conn and conn.is_connected():
+        conn.close()
 def leer_clean(nombre):
-  ruta = f"{CARPETA_CLEAN}/{nombre}"
-  if not os.path.exists(ruta):
-      print(f"  ⚠  No encontrado: {ruta}")
-      return pd.DataFrame()
-  df = pd.read_csv(ruta, encoding="utf-8")
-  if df.empty:
-      print(f"  ⚠  Archivo vacío: {ruta}")
-  return df
-
-def ejecutar(conn, sql, valores):
-  """Ejecuta un INSERT y devuelve el lastrowid. None si falla."""
-  try:
-      cu = conn.cursor()
-      cu.execute(sql, valores)
-      conn.commit()
-      return cu.lastrowid
-  except Error as e:
-      # Duplicados (1062) son normales con INSERT IGNORE → silenciar
-      if e.errno != 1062:
-          print(f"  ⚠  SQL Error {e.errno}: {e.msg}  | valores={valores}")
-      conn.rollback()
-      return None
-
-def ejecutar_muchos(conn, sql, lista_valores):
-  try:
-      cu = conn.cursor()
-      cu.executemany(sql, lista_valores)
-      conn.commit()
-      return cu.rowcount
-  except Error as e:
-      print(f"  ⚠  executemany Error: {e}")
-      conn.rollback()
-      return 0
-
-def obtener_id(conn, tabla, campo_pk, campo_busqueda, valor):
-  try:
-      cu = conn.cursor()
-      cu.execute(
-          f"SELECT {campo_pk} FROM {campo_pk.split('_id')[0]}s"
-          f" WHERE {campo_busqueda} = %s LIMIT 1",
-          (valor,))
-      res = cu.fetchone()
-      return res[0] if res else None
-  except Error:
-      return None
-
-def obtener_id_directo(conn, sql, valor):
-  """SELECT directo con SQL personalizado."""
-  try:
-      cu = conn.cursor()
-      cu.execute(sql, (valor,))
-      res = cu.fetchone()
-      return res[0] if res else None
-  except Error:
-      return None
-
-def cache_tabla(conn, sql_all, col_nombre, col_id):
-  cu = conn.cursor()
-  cu.execute(sql_all)
-  return {str(row[col_nombre]).strip(): row[col_id] for row in cu.fetchall()}
-
-# Regions
+    ruta = f"{CARPETA_CLEAN}/{nombre}"
+    if not os.path.exists(ruta):
+        print(f" No encontrado: {ruta}")
+        return pd.DataFrame()
+    df = pd.read_csv(ruta, encoding="utf-8")
+    if df.empty:
+        print(f"Archivo vacío: {ruta}")
+    return df
+def llamar_sp(conn, sp, params=()):
+    try:
+        cu = conn.cursor()
+        cu.callproc(sp, params)
+        conn.commit()
+        lastrow = cu.lastrowid if cu.lastrowid else True
+        cu.close()
+        return lastrow
+    except Error as e:
+        if e.errno != 1062:
+            print(f" {sp}{params} → {e.errno}: {e.msg}")
+        conn.rollback()
+        return None
+def leer_sp(conn, sp, params=()):
+    filas = []
+    try:
+        cu = conn.cursor()
+        cu.callproc(sp, params)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            for resultado in cu.stored_results():
+                filas = resultado.fetchall()
+        cu.close()
+    except Error as e:
+        print(f"{sp} lectura → {e}")
+    return filas
+def llamar_sp_migrant(conn, edad, sexo, id_origen, id_nivel):
+    try:
+        cu = conn.cursor()
+        cu.callproc("sp_create_migrant_full", (edad, sexo, id_origen, id_nivel))
+        conn.commit()
+        cu.close()
+        cu2 = conn.cursor()
+        cu2.execute("SELECT @last_migrant_id")
+        row = cu2.fetchone()
+        cu2.close()
+        return int(row[0]) if row and row[0] else None
+    except Error as e:
+        if e.errno != 1062:
+            print(f"  ⚠  sp_create_migrant_full → {e.errno}: {e.msg}")
+        conn.rollback()
+        return None
 def cargar_regions(conn):
-  print("\n[1] Cargando regions...")
-  df = leer_clean("clean_paises.csv")
-  if df.empty:
-      return
-  regiones = df["region"].dropna().unique()
-  insertados = 0
-  for region in regiones:
-      r = ejecutar(conn,
-          "INSERT IGNORE INTO regions (name) VALUES (%s)",
-          (str(region).strip(),))
-      if r:
-          insertados += 1
-  print(f"  ✔️  regions: {insertados} nuevas / {len(regiones)} únicas")
-
-# Countries
+    print("\nCargando regions")
+    df = leer_clean("clean_paises.csv")
+    if df.empty:
+        return
+    regiones = df["region"].dropna().unique()
+    n = 0
+    for region in regiones:
+        r = llamar_sp(conn, "sp_create_region", (str(region).strip(),))
+        if r:
+            n += 1
+    print(f"  ✔️  regions: {n} nuevas / {len(regiones)} únicas")
 def cargar_countries(conn):
-  print("\n[2] Cargando countries...")
-  df = leer_clean("clean_paises.csv")
-  if df.empty:
-      return
-
-  # Caché de regiones
-  cache_reg = cache_tabla(conn,
-      "SELECT name, region_id FROM regions",
-      col_nombre=0, col_id=1)
-
-  insertados = 0
-  for _, fila in df.iterrows():
-      nombre  = str(fila["nombre"]).strip()
-      iso     = str(fila["iso"]).strip().upper()
-      region  = str(fila["region"]).strip()
-      id_reg  = cache_reg.get(region)
-
-      r = ejecutar(conn,
-          "INSERT IGNORE INTO countries (name, iso_code, region_id) VALUES (%s, %s, %s)",
-          (nombre, iso, id_reg))
-      if r:
-          insertados += 1
-
-  # Aseguramos que México esté (a veces no viene en la API si no se agregó)
-  ejecutar(conn,
-      "INSERT IGNORE INTO countries (name, iso_code, region_id) VALUES (%s, %s, %s)",
-      ("Mexico", "MX", cache_reg.get("Americas")))
-
-  print(f"  ✔️  countries: {insertados} nuevas")
-
-# Socioeconomic_levels
+    print("\nCargando countries")
+    df = leer_clean("clean_paises.csv")
+    if df.empty:
+        return
+    filas = leer_sp(conn, "sp_read_all_regions")
+    cache_reg = {str(f[1]).strip(): f[0] for f in filas}
+    n = 0
+    for _, fila in df.iterrows():
+        nombre = str(fila["nombre"]).strip()
+        iso = str(fila["iso"]).strip().upper()
+        id_reg = cache_reg.get(str(fila["region"]).strip())
+        r = llamar_sp(conn, "sp_create_country", (nombre, iso, id_reg))
+        if r:
+            n += 1
+    llamar_sp(conn, "sp_create_country", ("Mexico", "MX", cache_reg.get("Americas")))
+    print(f"  ✔️  countries: {n} nuevas")
 def cargar_niveles(conn):
-  print("\n[3] Cargando socioeconomic_levels...")
-  df = leer_clean("clean_niveles.csv")
-  if df.empty:
-      return
-  lista = [(str(r["description"]).strip(),) for _, r in df.iterrows()]
-  n = ejecutar_muchos(conn,
-      "INSERT IGNORE INTO socioeconomic_levels (description) VALUES (%s)", lista)
-  print(f"  ✔️  socioeconomic_levels: {len(lista)} procesados")
-
-
-# Motive_categories
+    print("\nCargando socioeconomic_levels")
+    df = leer_clean("clean_niveles.csv")
+    if df.empty:
+        return
+    n = 0
+    for _, fila in df.iterrows():
+        r = llamar_sp(
+            conn, "sp_create_level", (str(fila["description"]).strip(),))
+        if r:
+            n += 1
+    print(f"  ✔️  socioeconomic_levels: {n} nuevas")
 def cargar_categorias(conn):
-  print("\n[4] Cargando motive_categories...")
-  df = leer_clean("clean_categorias.csv")
-  if df.empty:
-      return
-  lista = [(str(r["name"]).strip(),) for _, r in df.iterrows()]
-  ejecutar_muchos(conn,
-      "INSERT IGNORE INTO motive_categories (name) VALUES (%s)", lista)
-  print(f"  ✔️  motive_categories: {len(lista)} procesados")
-
-
-# Motives
+    print("\nCargando motive_categories")
+    df = leer_clean("clean_categorias.csv")
+    if df.empty:
+        return
+    n = 0
+    for _, fila in df.iterrows():
+        r = llamar_sp(
+            conn,
+            "sp_create_motive_category",
+            (str(fila["name"]).strip(),),
+        )
+        if r:
+            n += 1
+    print(f"✔️motive_categories: {n} nuevas")
 def cargar_motivos(conn):
-  print("\n[5] Cargando motives...")
-  df = leer_clean("clean_motivos.csv")
-  if df.empty:
-      return
-
-
-  cache_cat = cache_tabla(conn,
-      "SELECT name, category_id FROM motive_categories",col_nombre=0, col_id=1)
-  insertados = 0
-  for _, fila in df.iterrows():
-      nombre = str(fila["name"]).strip()
-      cat    = str(fila["category"]).strip()
-      id_cat = cache_cat.get(cat)
-      r = ejecutar(conn,
-          "INSERT IGNORE INTO motives (name, category_id) VALUES (%s, %s)",
-          (nombre, id_cat))
-      if r:
-          insertados += 1
-  print(f"  ✔️  motives: {insertados} nuevos")
-
-
-# Periods
+    print("\nCargando motives")
+    df = leer_clean("clean_motivos.csv")
+    if df.empty:
+        return
+    filas = leer_sp(conn, "sp_read_all_motive_categories")
+    cache_cat = {str(f[1]).strip(): f[0] for f in filas}
+    n = 0
+    for _, fila in df.iterrows():
+        id_cat = cache_cat.get(str(fila["category"]).strip())
+        r = llamar_sp(
+            conn, "sp_create_motive", (str(fila["name"]).strip(), id_cat))
+        if r:
+            n += 1
+    print(f"✔️  motives: {n} nuevos")
 def cargar_periodos(conn):
-  print("\n[6] Cargando periods...")
-  df = leer_clean("clean_periodos.csv")
-  if df.empty:
-      return
-  lista = [(int(r["year"]),) for _, r in df.iterrows()]
-  ejecutar_muchos(conn,
-      "INSERT IGNORE INTO periods (year) VALUES (%s)", lista)
-  print(f"  ✔️  periods: {len(lista)} procesados")
-
-
-# Risks
+    print("\nCargando periods")
+    df = leer_clean("clean_periodos.csv")
+    if df.empty:
+        return
+    n = 0
+    for _, fila in df.iterrows():
+        r = llamar_sp(conn, "sp_create_period", (int(fila["year"]),))
+        if r:
+            n += 1
+    print(f"✔️  periods: {n} nuevos")
 def cargar_risks(conn):
-  print("\n[7] Cargando risks...")
-  insertados = 0
-
-
-  # Catálogo base
-  df_base = leer_clean("clean_riesgos.csv")
-  for _, fila in df_base.iterrows():
-      r = ejecutar(conn,
-          "INSERT IGNORE INTO risks (description, type) VALUES (%s, %s)",
-          (str(fila["description"]).strip(), str(fila["type"]).strip()))
-      if r:
-          insertados += 1
-
-
-  # Causas reales del Missing Migrants Dataset
-  df_real = leer_clean("clean_riesgos_missing.csv")
-  for _, fila in df_real.iterrows():
-      desc = str(fila["description"]).strip()[:249]   # max 250 chars
-      tipo = str(fila["type"]).strip()
-      if tipo not in ["Physical", "Legal", "Economic", "Social"]:
-          tipo = "Physical"
-      r = ejecutar(conn,
-          "INSERT IGNORE INTO risks (description, type) VALUES (%s, %s)",
-          (desc, tipo))
-      if r:
-          insertados += 1
-
-
-  print(f"  ✔️  risks: {insertados} nuevos")
-
-
-# Impacts
+    print("\nCargando risks")
+    n = 0
+    for archivo in ["clean_riesgos.csv", "clean_riesgos_missing.csv"]:
+        df = leer_clean(archivo)
+        for _, fila in df.iterrows():
+            tipo = str(fila["type"]).strip()
+            if tipo not in ["Physical", "Legal", "Economic", "Social"]:
+                tipo = "Physical"
+            desc = str(fila["description"]).strip()[:249]
+            r = llamar_sp(conn, "sp_create_risk", (desc, tipo))
+            if r:
+                n += 1
+    print(f"✔️  risks: {n} nuevos")
 def cargar_impacts(conn):
-  print("\n[8] Cargando impacts...")
-  df = leer_clean("clean_impactos.csv")
-  if df.empty:
-      return
-  insertados = 0
-  for _, fila in df.iterrows():
-      tipo = str(fila["type"]).strip()
-      desc = str(fila["description"]).strip()
-      if tipo not in ["Social", "Economic"]:
-          tipo = "Social"
-      r = ejecutar(conn,
-          "INSERT IGNORE INTO impacts (type, description) VALUES (%s, %s)",
-          (tipo, desc))
-      if r:
-          insertados += 1
-  print(f"  ✔️  impacts: {insertados} nuevos")
-
-# 9. GLOBAL_STATISTICS
-# =============================================================================
+    print("\nCargando impacts")
+    df = leer_clean("clean_impactos.csv")
+    if df.empty:
+        return
+    n = 0
+    for _, fila in df.iterrows():
+        tipo = str(fila["type"]).strip()
+        if tipo not in ["Social", "Economic"]:
+            tipo = "Social"
+        r = llamar_sp(
+            conn, "sp_create_impact", (tipo, str(fila["description"]).strip())
+        )
+        if r:
+            n += 1
+    print(f"✔️impacts: {n} nuevos")
 def cargar_global_statistics(conn):
-    print("\n[9] Cargando global_statistics...")
-
-    # Caché de países por nombre y por ISO
-    cu = conn.cursor()
-    cu.execute("SELECT name, iso_code, country_id FROM countries")
-    filas = cu.fetchall()
-    cache_nombre = {str(f[0]).strip().lower(): f[2] for f in filas}
-    cache_iso    = {str(f[1]).strip().upper(): f[2] for f in filas if f[1]}
-
+    print("\nCargando global_statistics")
+    filas = leer_sp(conn, "sp_read_all_countries")
+    cache_nombre = {str(f[1]).strip().lower(): f[0] for f in filas}
+    cache_iso = {str(f[2]).strip().upper(): f[0] for f in filas if f[2]}
     def buscar_pais(iso, nombre):
         id_p = cache_iso.get(str(iso).strip().upper()) if iso else None
         if not id_p:
             id_p = cache_nombre.get(str(nombre).strip().lower())
         return id_p
-
-    insertados = 0
-
-    # ── Fuente 1: clean_estadisticas.csv (WB API + WB CSV + WorldPop + UNDESA)
-    df_est = leer_clean("clean_estadisticas.csv")
-    if not df_est.empty:
-        for _, fila in df_est.iterrows():
-            id_pais = buscar_pais(fila.get("iso",""), fila.get("pais",""))
+    n = 0
+    fuentes = [
+        ("clean_estadisticas.csv","iso","pais","anio","total_migrantes","world_percentage",),
+        ("clean_unhcr.csv", "iso_origen", "pais_origen", "anio", "total", None),
+    ]
+    for archivo, col_iso, col_pais, col_anio, col_total, col_pct in fuentes:
+        df = leer_clean(archivo)
+        if df.empty:
+            continue
+        n_archivo = 0
+        for _, fila in df.iterrows():
+            id_pais = buscar_pais(
+                fila.get(col_iso, ""), fila.get(col_pais, "")
+            )
             if not id_pais:
                 continue
-            r = ejecutar(conn,
-                """INSERT IGNORE INTO global_statistics
-                   (year, country_id, total_migrants, world_percentage)
-                   VALUES (%s, %s, %s, %s)""",
-                (int(fila["anio"]), id_pais,
-                 int(fila["total_migrantes"]),
-                 float(fila.get("world_percentage", 0))))
+            pct = (
+                float(fila.get(col_pct, 0))
+                if col_pct and col_pct in fila
+                else 0.0
+            )
+            r = llamar_sp(
+                conn,
+                "sp_create_global_stat",
+                (
+                    int(fila[col_anio]),
+                    id_pais,
+                    int(fila.get(col_total, 0)),
+                    pct,
+                ),
+            )
             if r:
-                insertados += 1
-        print(f"  → estadisticas.csv: {insertados} insertados")
+                n_archivo += 1
+        print(f"  → {archivo}: {n_archivo} insertados")
+        n += n_archivo
 
-    # ── Fuente 2: clean_unhcr.csv (demografía UNHCR por país de origen)
-    df_unhcr = leer_clean("clean_unhcr.csv")
-    n_unhcr = 0
-    if not df_unhcr.empty:
-        for _, fila in df_unhcr.iterrows():
-            id_pais = buscar_pais(fila.get("iso_origen",""), fila.get("pais_origen",""))
-            if not id_pais:
-                continue
-            r = ejecutar(conn,
-                """INSERT IGNORE INTO global_statistics
-                   (year, country_id, total_migrants, world_percentage)
-                   VALUES (%s, %s, %s, %s)""",
-                (int(fila["anio"]), id_pais,
-                 int(fila.get("total", 0)), 0.0))
-            if r:
-                n_unhcr += 1
-        print(f"  → unhcr.csv       : {n_unhcr} insertados")
-        insertados += n_unhcr
-
-    print(f"  ✔️  global_statistics total: {insertados}")
-
-# =============================================================================
-# 10. MIGRANTS  +  11. MIGRATIONS
-# =============================================================================
+    print(f"☑️️global_statistics total: {n}")
 def cargar_migrants_migrations(conn):
-    print("\n[10/11] Cargando migrants y migrations (INEGI)...")
-
+    print("\nCargando migrants y migrations (INEGI)")
     df = leer_clean("clean_inegi.csv")
     if df.empty:
-        print("  ⚠  clean_inegi.csv vacío — sin registros de migrants/migrations")
+        print(" ⚠ clean_inegi.csv vacío")
         return
-
-    # Cachés
-    cu = conn.cursor()
-
-    cu.execute("SELECT name, country_id FROM countries")
-    cache_paises = {str(r[0]).strip().lower(): r[1] for r in cu.fetchall()}
-
-    cu.execute("SELECT description, level_id FROM socioeconomic_levels")
-    cache_nivel = {str(r[0]).strip(): r[1] for r in cu.fetchall()}
-
-    cu.execute("SELECT name, motive_id FROM motives")
-    cache_motivo = {str(r[0]).strip(): r[1] for r in cu.fetchall()}
-
-    cu.execute("SELECT year, period_id FROM periods")
-    cache_periodo = {int(r[0]): r[1] for r in cu.fetchall()}
-
-    # ID de México (destino principal)
+    filas_paises = leer_sp(conn, "sp_read_all_countries")
+    cache_paises = {str(f[1]).strip().lower(): f[0] for f in filas_paises}
+    filas_niveles = leer_sp(conn, "sp_read_all_levels")
+    cache_nivel = {str(f[1]).strip(): f[0] for f in filas_niveles}
+    filas_motivos = leer_sp(conn, "sp_read_all_motives")
+    cache_motivo = {str(f[1]).strip(): f[0] for f in filas_motivos}
+    filas_periodos = leer_sp(conn, "sp_read_all_periods")
+    cache_periodo = {int(f[1]): f[0] for f in filas_periodos}
     id_mexico = cache_paises.get("mexico")
     if not id_mexico:
-        print("  ❌  México no encontrado en countries. Revisa cargar_countries().")
+        print("❌México no encontrado en countries.")
         return
-
-    n_migrants  = 0
-    n_migs      = 0
-    n_errores   = 0
-
+    print(f"Cache países: {len(cache_paises)} | niveles: {len(cache_nivel)} "
+        f"| motivos: {len(cache_motivo)} | periodos: {len(cache_periodo)}")
+    n_migrants = 0
+    n_migs = 0
+    n_errores = 0
     for _, fila in df.iterrows():
-        # ── País de origen ──────────────────────────────────────────────
-        nombre_orig = str(fila.get("origin_country", "Mexico")).strip().lower()
-        id_origen   = cache_paises.get(nombre_orig, id_mexico)
+        id_origen = cache_paises.get(
+            str(fila.get("origin_country", "Mexico")).strip().lower(), id_mexico)
 
-        # ── Nivel socioeconómico ────────────────────────────────────────
-        nivel_str = str(fila.get("socioeconomic_level", "Middle")).strip()
-        id_nivel  = cache_nivel.get(nivel_str, cache_nivel.get("Middle"))
+        id_nivel = cache_nivel.get(
+            str(fila.get("socioeconomic_level", "Middle")).strip(),
+            cache_nivel.get("Middle"),)
 
-        # ── Sexo ────────────────────────────────────────────────────────
         sexo = str(fila.get("sex", "Other")).strip()
         if sexo not in ["Male", "Female", "Other"]:
             sexo = "Other"
 
-        # ── Edad ────────────────────────────────────────────────────────
         try:
             edad = int(fila.get("age", 28))
             if not 0 <= edad <= 120:
@@ -363,216 +271,118 @@ def cargar_migrants_migrations(conn):
         except (ValueError, TypeError):
             edad = 28
 
-        # ── INSERT migrant ──────────────────────────────────────────────
-        id_migrante = ejecutar(conn,
-            """INSERT INTO migrants
-               (age, sex, origin_country_id, socioeconomic_level_id)
-               VALUES (%s, %s, %s, %s)""",
-            (edad, sexo, id_origen, id_nivel))
-
+        id_migrante = llamar_sp_migrant(conn, edad, sexo, id_origen, id_nivel)
         if not id_migrante:
             n_errores += 1
             continue
         n_migrants += 1
 
-        # ── Motivo ──────────────────────────────────────────────────────
-        motivo_str = str(fila.get("motive", "Other")).strip()
-        id_motivo  = cache_motivo.get(motivo_str, cache_motivo.get("Other"))
+        id_motivo = cache_motivo.get(
+            str(fila.get("motive", "Other")).strip(), cache_motivo.get("Other"))
 
-        # ── Periodo ─────────────────────────────────────────────────────
         try:
             anio = int(fila.get("year", 2020))
         except (ValueError, TypeError):
             anio = 2020
+
         id_periodo = cache_periodo.get(anio)
         if not id_periodo:
-            # Si el año no está en catálogo, insertar y actualizar caché
-            r = ejecutar(conn,
-                "INSERT IGNORE INTO periods (year) VALUES (%s)", (anio,))
-            cu.execute("SELECT period_id FROM periods WHERE year = %s", (anio,))
-            res = cu.fetchone()
-            id_periodo = res[0] if res else None
-            if id_periodo:
+            llamar_sp(conn, "sp_create_period", (anio,))
+            nuevos = leer_sp(conn, "sp_read_period_by_year", (anio,))
+            if nuevos:
+                id_periodo = nuevos[0][0]
                 cache_periodo[anio] = id_periodo
 
         if not id_motivo or not id_periodo:
             n_errores += 1
             continue
 
-        # ── Status ──────────────────────────────────────────────────────
         status = str(fila.get("status", "Established")).strip()
         if status not in ["In transit", "Established", "Returned", "Deported"]:
             status = "Established"
 
-        # ── País destino ────────────────────────────────────────────────
-        dest_str   = str(fila.get("destination_country", "Mexico")).strip().lower()
-        id_destino = cache_paises.get(dest_str, id_mexico)
+        id_destino = cache_paises.get(
+            str(fila.get("destination_country", "Mexico")).strip().lower(),
+            id_mexico,
+        )
 
-        # ── INSERT migration ────────────────────────────────────────────
-        r = ejecutar(conn,
-            """INSERT IGNORE INTO migrations
-               (migrant_id, destination_country_id, motive_id, period_id, status_)
-               VALUES (%s, %s, %s, %s, %s)""",
-            (id_migrante, id_destino, id_motivo, id_periodo, status))
+        r = llamar_sp(
+            conn,
+            "sp_create_migration",
+            (id_migrante, id_destino, id_motivo, id_periodo),
+        )
         if r:
             n_migs += 1
-
-    print(f"  ✔️  migrants insertados : {n_migrants}")
-    print(f"  ✔️  migrations insertados: {n_migs}")
+            if status != "In transit":
+                filas_mig = leer_sp(
+                    conn, "sp_read_migrant_last", (id_migrante,))
+                if filas_mig:
+                    llamar_sp(
+                        conn, "sp_update_migration", (filas_mig[0][0], status))
+    print(f"✔️migrants:{n_migrants}")
+    print(f" ️☑️migrations: {n_migs}")
     if n_errores:
-        print(f"  ⚠  filas omitidas (FK no encontrada): {n_errores}")
-
-# =============================================================================
-# 12. MIGRATION_RISK  (vincula migraciones con riesgos del Missing Dataset)
-# =============================================================================
+        print(f"⚠ omitidos: {n_errores}")
 def cargar_migration_risk(conn):
-    print("\n[12] Cargando migration_risk...")
-
+    print("\nCargando migration_risk...")
     df_missing = leer_clean("clean_missing.csv")
     if df_missing.empty:
-        print("  ⚠  clean_missing.csv vacío")
+        print("⚠ clean_missing.csv vacío")
         return
-
-    # Caché de riesgos por descripción
-    cu = conn.cursor()
-    cu.execute("SELECT description, risk_id FROM risks")
-    cache_risk = {str(r[0]).strip(): r[1] for r in cu.fetchall()}
-
-    # Caché de países
-    cu.execute("SELECT name, country_id FROM countries")
-    cache_paises = {str(r[0]).strip().lower(): r[1] for r in cu.fetchall()}
-    id_mexico = cache_paises.get("mexico")
-
-    # Tomamos todas las migraciones insertadas (las del INEGI)
-    cu.execute("SELECT migration_id FROM migrations LIMIT 5000")
-    ids_mig = [r[0] for r in cu.fetchall()]
+    filas_risk = leer_sp(conn, "sp_read_all_risks")
+    cache_risk = {str(f[1]).strip(): f[0] for f in filas_risk}
+    ids_mig = [f[0] for f in leer_sp(conn, "sp_read_all_migrations")]
     if not ids_mig:
-        print("  ⚠  No hay migrations en BD aún")
+        print("⚠ No hay migrations en BD")
         return
-
-    # Estrategia: vinculamos cada causa de muerte única con las
-    # migraciones cuyo país de destino sea México, distribuyendo
-    # los riesgos de forma proporcional por región del incidente
-    causas_unicas = (
-        df_missing["Cause of Death"]
-        .dropna()
-        .unique()
-    )
-
+    causas = df_missing["Cause of Death"].dropna().unique()
     n = 0
-    idx_mig = 0   # índice rotatorio sobre ids_mig
-    for causa in causas_unicas:
+    idx = 0
+    for causa in causas:
         id_risk = cache_risk.get(str(causa).strip())
         if not id_risk:
             continue
-        # Asignamos este riesgo a las primeras N migraciones (rotatorio)
         cantidad = min(10, len(ids_mig))
         for i in range(cantidad):
-            id_mig = ids_mig[(idx_mig + i) % len(ids_mig)]
-            r = ejecutar(conn,
-                "INSERT IGNORE INTO migration_risk (migration_id, risk_id) VALUES (%s, %s)",
-                (id_mig, id_risk))
+            id_mig = ids_mig[(idx + i) % len(ids_mig)]
+            r = llamar_sp(conn, "sp_create_migration_risk", (id_mig, id_risk))
             if r:
                 n += 1
-        idx_mig = (idx_mig + cantidad) % len(ids_mig)
-
-    print(f"  ✔️  migration_risk: {n} vínculos insertados")
-
-# =============================================================================
-# 13. MIGRATION_IMPACT  (vincula migraciones con impactos)
-# =============================================================================
+        idx = (idx + cantidad) % len(ids_mig)
+    print(f"✔️migration_risk: {n} vínculos")
 def cargar_migration_impact(conn):
-    print("\n[13] Cargando migration_impact...")
-
-    # Caché de impactos
-    cu = conn.cursor()
-    cu.execute("SELECT description, impact_id FROM impacts")
-    cache_impact = {str(r[0]).strip(): r[1] for r in cu.fetchall()}
-
-    cu.execute("SELECT migration_id FROM migrations LIMIT 5000")
-    ids_mig = [r[0] for r in cu.fetchall()]
+    print("\nCargando migration_impact...")
+    filas_imp = leer_sp(conn, "sp_read_all_impacts")
+    cache_imp = {str(f[1]).strip(): f[0] for f in filas_imp}
+    ids_mig = [f[0] for f in leer_sp(conn, "sp_read_all_migrations")]
     if not ids_mig:
-        print("  ⚠  No hay migrations en BD aún")
+        print("⚠No hay migrations en BD")
         return
-
-    # Cada impacto se vincula con un subconjunto de migraciones
-    impactos = list(cache_impact.items())  # [(descripcion, id), ...]
+    impactos = list(cache_imp.items())
     n = 0
     for i, (desc, id_imp) in enumerate(impactos):
-        # Tomamos cada 7mo elemento de ids_mig para distribuir
-        subconjunto = ids_mig[i::len(impactos)] if len(impactos) > 0 else []
-        for id_mig in subconjunto[:50]:   # máximo 50 vínculos por impacto
-            r = ejecutar(conn,
-                "INSERT IGNORE INTO migration_impact (migration_id, impact_id) VALUES (%s, %s)",
-                (id_mig, id_imp))
+        subconjunto = ids_mig[i :: len(impactos)] if impactos else []
+        for id_mig in subconjunto[:50]:
+            r = llamar_sp(conn, "sp_create_migration_impact", (id_mig, id_imp))
             if r:
                 n += 1
-
-    print(f"  ✔️  migration_impact: {n} vínculos insertados")
-
-# =============================================================================
-# VERIFICACIÓN FINAL
-# =============================================================================
+    print(f"✔️migration_impact: {n} vínculos")
 def verificar(conn):
-    print("\n" + "=" * 55)
-    print("VERIFICACIÓN — CONTEO POR TABLA")
-    print("=" * 55)
-
-    tablas = [
-        "regions", "countries", "socioeconomic_levels",
-        "motive_categories", "motives", "periods",
-        "risks", "impacts", "global_statistics",
-        "migrants", "migrations",
-        "migration_risk", "migration_impact", "audit",
-    ]
-    cu = conn.cursor()
-    for tabla in tablas:
-        try:
-            cu.execute(f"SELECT COUNT(*) FROM {tabla}")
-            n = cu.fetchone()[0]
-            print(f"  {tabla:<30}: {n:>7} registros")
-        except Error as e:
-            print(f"  {tabla:<30}: ❌ {e}")
-
-    print("\n--- Top 5 países de origen ---")
-    cu.execute("""
-        SELECT c.name, COUNT(*) AS total
-        FROM migrants m
-        JOIN countries c ON m.origin_country_id = c.country_id
-        GROUP BY c.name ORDER BY total DESC LIMIT 5
-    """)
-    for row in cu.fetchall():
-        print(f"  {row[0]:<25}: {row[1]}")
-
-    print("\n--- Top 5 motivos ---")
-    cu.execute("""
-        SELECT mo.name, COUNT(*) AS total
-        FROM migrations mg
-        JOIN motives mo ON mg.motive_id = mo.motive_id
-        GROUP BY mo.name ORDER BY total DESC LIMIT 5
-    """)
-    for row in cu.fetchall():
-        print(f"  {row[0]:<35}: {row[1]}")
-
-    print("\n--- Distribución por sexo ---")
-    cu.execute("""
-        SELECT sex, COUNT(*) FROM migrants GROUP BY sex
-    """)
-    for row in cu.fetchall():
-        print(f"  {row[0]:<10}: {row[1]}")
-
-# =============================================================================
-# MAIN
-# =============================================================================
+    print("\nVERIFICACIÓN — CONTEO POR TABLA")
+    tablas_sp = [("regions", "sp_read_all_regions"),("countries", "sp_read_all_countries"),
+        ("socioeconomic_levels", "sp_read_all_levels"),("motive_categories", "sp_read_all_motive_categories"),
+        ("motives", "sp_read_all_motives"),("periods", "sp_read_all_periods"),
+        ("risks", "sp_read_all_risks"),("impacts", "sp_read_all_impacts"),
+        ("global_statistics", "sp_read_all_global_stats"),("migrations", "sp_read_all_migrations"),]
+    for nombre, sp in tablas_sp:
+        filas = leer_sp(conn, sp)
+        print(f"  {nombre:<30}: {len(filas):>7} registros")
+    print("\n✅Verificación completada")
 if __name__ == "__main__":
-    print("\n💾 FASE 3 — CARGA A MYSQL\n")
-
     conn = conectar()
     if not conn:
-        print("No se pudo conectar. Revisa DB_CONFIG.")
+        print("Error en los parámetros de conexión")
         exit(1)
-
-    # Orden estricto respetando FK
     cargar_regions(conn)
     cargar_countries(conn)
     cargar_niveles(conn)
@@ -588,5 +398,3 @@ if __name__ == "__main__":
 
     verificar(conn)
     desconectar(conn)
-
-    print("\n✅  Fase 3 completada — BD lista para la Fase 4 (dashboards)")
