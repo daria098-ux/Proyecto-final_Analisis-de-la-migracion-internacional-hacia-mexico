@@ -407,7 +407,7 @@ def load_migrants_migrations(conn):
         # INSERT migration
         r = execute(conn,
             """INSERT IGNORE INTO migrations
-               (migrant_id, destination_country_id, motive_id, period_id, status_)
+               (migrant_id, destination_country_id, motive_id, period_id, migration_status)
                VALUES (%s, %s, %s, %s, %s)""",
             (id_migrant, id_dest, id_motive, id_period, status))
         if r:
