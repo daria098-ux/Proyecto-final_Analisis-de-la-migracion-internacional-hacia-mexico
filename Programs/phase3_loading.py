@@ -13,7 +13,7 @@ Each table has its own loading function that:
 
 Typical usage:
     Run as part of the pipeline (run_all.py) or standalone:
-        python fase3.py
+        python phase3_loading.py
 """
 
 import os

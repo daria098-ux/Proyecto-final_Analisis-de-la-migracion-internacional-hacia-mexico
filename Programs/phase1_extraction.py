@@ -8,7 +8,7 @@ raw outputs are saved as CSVs in the data_raw/ folder for Phase 2 to clean.
 
 Typical usage:
     Run as part of the pipeline (run_all.py) or standalone:
-        python extraccion.py
+        python phase1_extraction.py
 """
 
 import requests

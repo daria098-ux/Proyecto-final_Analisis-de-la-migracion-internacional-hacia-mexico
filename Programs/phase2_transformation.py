@@ -1,13 +1,13 @@
 """
 Phase 2: Data Transformation & Cleaning
 
-This script takes the raw CSVs produced by Phase 1 (extraccion.py) from
+This script takes the raw CSVs produced by Phase 1 (phase1_extraction.py) from
 the data_raw/ folder, cleans and normalizes them, and writes the cleaned
-CSVs to data_clean/ for Phase 3 (fase3.py) to load into MySQL.
+CSVs to data_clean/ for Phase 3 (phase3_loading.py) to load into MySQL.
 
 Typical usage:
     Run as part of the pipeline (run_all.py) or standalone:
-        python fase2_transformacion_datos.py
+        python phase2_transformation.py
 """
 
 import pandas as pd

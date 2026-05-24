@@ -8,7 +8,7 @@ mexico_migration_nosql MongoDB database.
 
 Typical usage:
     Run as part of the pipeline (run_all.py) or standalone:
-        python english_cloning.py
+        python phase3.5_mongodb_clone.py
 """
 
 from pymongo import MongoClient
