@@ -2,6 +2,76 @@
 > Final Integrative Project — Programming · Database · Data Analysis
 ---
 
+## Quick Start
+
+### Prerequisites
+
+| Requirement | Version |
+|-------------|---------|
+| Python | 3.9+ |
+| MySQL Server | 8.0+ |
+| MongoDB | 6.0+ (optional, for NoSQL clone) |
+
+### Setup Instructions
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/daria098-ux/Proyecto-final_Analisis-de-la-migracion-internacional-hacia-mexico.git
+   cd Proyecto-final_Analisis-de-la-migracion-internacional-hacia-mexico
+   ```
+
+2. **Install Python dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Create the MySQL database**
+
+   Open MySQL Workbench (or any MySQL client) and run:
+   ```sql
+   -- Execute the full schema script (creates database, tables, triggers, SPs and views)
+   source Databases/mexico_migration_final.sql;
+   ```
+
+4. **Configure your MySQL password**
+
+   Open each of these files and set your MySQL root password where it says `"password": ""`:
+   - `Programs/phase3_loading.py` → line `"password": ""`
+   - `Programs/phase3.5_mongodb_clone.py` → line `password=""`
+   - `Programs/phase4_patches.py` → line `"password": ""`
+   - `Dashboards/export_views.py` → line `"password": ""`
+
+5. **Run the full ETL pipeline**
+   ```bash
+   python run_all.py
+   ```
+
+   This automatically executes all phases in order:
+   ```
+   Phase 1  →  Extraction (APIs + CSVs)
+   Phase 2  →  Transformation (cleaning)
+   Phase 3  →  MySQL Loading (stored procedures)
+   Phase 4  →  SQL Patches (improved views)
+   Phase 5  →  MongoDB Clone (optional, use --skip-mongo to skip)
+   Phase 6  →  Export Views (generates CSVs for dashboard)
+   ```
+
+6. **Launch the dashboard**
+   ```bash
+   cd Dashboards
+   streamlit run dashboard.py
+   ```
+
+### Optional Commands
+
+```bash
+python run_all.py --skip-mongo     # skip MongoDB cloning
+python run_all.py --only extract   # run only Phase 1
+python run_all.py --from load      # start from Phase 3
+```
+
+---
+
 ## Description
 
 Complete ETL system that extracts, transforms, loads, and visualizes real data about international migration toward Mexico. The project answers five key questions using data from official sources (INEGI, UN, World Bank, UNHCR), a normalized relational MySQL database (up to 3NF), and interactive dashboards with Python.
