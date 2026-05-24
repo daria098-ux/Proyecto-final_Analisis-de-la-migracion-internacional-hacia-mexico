@@ -19,7 +19,7 @@ from decimal import Decimal
 mysql_conn = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="Politron85",
+    password="",
     database="mexico_migration",
     port=3306
 )

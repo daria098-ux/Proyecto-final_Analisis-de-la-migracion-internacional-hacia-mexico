@@ -25,7 +25,7 @@ import pandas as pd
 DB_CONFIG = {
     "host":     "localhost",
     "user":     "root",
-    "password": "Politron85",
+    "password": "",
     "database": "mexico_migration",
     "port":     3306,
 }

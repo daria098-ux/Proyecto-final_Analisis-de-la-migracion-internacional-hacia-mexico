@@ -3,7 +3,7 @@ export_views.py - Export the 6 SQL views from mexico_migration to CSV files.
 
 How to use:
     1. Make sure Phases 1, 2 and 3 have been executed (the DB must be populated).
-    2. Adjust DB_CONFIG below with your password if different from "Politron85".
+    2. Adjust DB_CONFIG below with your MySQL password.
     3. Run this script:
          python export_views.py
     4. Six vw_*.csv files will be generated in this same folder.
@@ -32,11 +32,11 @@ except ImportError:
     sys.exit(1)
 
 
-# Configuration — adjust your password if different from "Politron85"
+# Configuration — adjust your MySQL password
 DB_CONFIG = {
     "host":     "localhost",
     "user":     "root",
-    "password": "Politron85",
+    "password": "",
     "database": "mexico_migration",
     "port":     3306,
 }
