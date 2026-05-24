@@ -66,7 +66,7 @@ PHASES = [
     {
         "id":          "extract",
         "name":        "EXTRACTION",
-        "script":      PROGRAMS / "extraccion.py",
+        "script":      PROGRAMS / "phase1_extraction.py",
         "cwd":         PROGRAMS,
         "description": "Download data from 3 APIs and read 5 local CSVs",
         "optional":    False,
@@ -74,7 +74,7 @@ PHASES = [
     {
         "id":          "transform",
         "name":        "TRANSFORMATION",
-        "script":      PROGRAMS / "fase2_transformacion_datos.py",
+        "script":      PROGRAMS / "phase2_transformation.py",
         "cwd":         PROGRAMS,
         "description": "Clean, normalize and generate static catalogs",
         "optional":    False,
@@ -82,7 +82,7 @@ PHASES = [
     {
         "id":          "load",
         "name":        "MYSQL LOAD",
-        "script":      PROGRAMS / "fase3.py",
+        "script":      PROGRAMS / "phase3_loading.py",
         "cwd":         PROGRAMS,
         "description": "Insert cleaned CSVs into the mexico_migration database",
         "optional":    False,
@@ -90,7 +90,7 @@ PHASES = [
     {
         "id":          "patches",
         "name":        "SQL PATCHES",
-        "script":      PROGRAMS / "aplicar_patches.py",
+        "script":      PROGRAMS / "phase4_patches.py",
         "cwd":         PROGRAMS,
         "description": "Apply patches.sql (improves SQL views for the dashboard)",
         "optional":    False,
@@ -98,7 +98,7 @@ PHASES = [
     {
         "id":          "mongo",
         "name":        "MONGODB CLONE",
-        "script":      PROGRAMS / "english_cloning.py",
+        "script":      PROGRAMS / "phase3.5_mongodb_clone.py",
         "cwd":         PROGRAMS,
         "description": "Clone MySQL tables to MongoDB (NoSQL)",
         "optional":    True,

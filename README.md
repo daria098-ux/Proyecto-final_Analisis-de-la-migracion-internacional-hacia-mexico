@@ -25,11 +25,11 @@ migracion-mexico/
 ├── run_all.py                        # Pipeline orchestrator (runs all phases in order)
 │
 ├── Programs/
-│   ├── extraccion.py                 # Phase 1 — Extract: APIs + local CSVs
-│   ├── fase2_transformacion_datos.py # Phase 2 — Transform: cleaning and standardization
-│   ├── fase3.py                      # Phase 3 — Load: insertion into MySQL
-│   ├── english_cloning.py           # Phase 3.5 — Clone: MySQL → MongoDB
-│   └── aplicar_patches.py           # Phase 4 — Apply SQL view patches
+│   ├── phase1_extraction.py          # Phase 1 — Extract: APIs + local CSVs
+│   ├── phase2_transformation.py      # Phase 2 — Transform: cleaning and standardization
+│   ├── phase3_loading.py             # Phase 3 — Load: insertion into MySQL
+│   ├── phase3.5_mongodb_clone.py     # Phase 3.5 — Clone: MySQL → MongoDB
+│   └── phase4_patches.py            # Phase 4 — Apply SQL view patches
 │
 ├── Dashboards/
 │   ├── dashboard.py                  # 5 interactive Streamlit dashboards
@@ -54,7 +54,7 @@ migracion-mexico/
 ```
 ---
 ## Project phases
-### Phase 1 — Extraction `Programs/extraccion.py`
+### Phase 1 — Extraction `Programs/phase1_extraction.py`
 
 Extracts data from **3 APIs** and **5 local CSV files** and saves them to `data_raw/`.
 
@@ -78,7 +78,7 @@ Extracts data from **3 APIs** and **5 local CSV files** and saves them to `data_
 
 ---
 
-### Phase 2 — Transformation `Programs/fase2_transformacion_datos.py`
+### Phase 2 — Transformation `Programs/phase2_transformation.py`
 
 Reads CSVs from `data_raw/`, cleans them, and generates normalized CSVs in `data_clean/`.
 
@@ -111,7 +111,7 @@ clean_impacts.csv           # impacts
 
 ---
 
-### Phase 3 — Loading `Programs/fase3.py`
+### Phase 3 — Loading `Programs/phase3_loading.py`
 
 Inserts all data into MySQL respecting foreign key order.
 
@@ -133,13 +133,13 @@ Inserts all data into MySQL respecting foreign key order.
 13. migration_impact        # clean_impacts.csv
 ```
 ---
-### Phase 3.5 — Clone `Programs/english_cloning.py`
+### Phase 3.5 — Clone `Programs/phase3.5_mongodb_clone.py`
 
 Clones all 14 MySQL tables into MongoDB collections using bulk-read stored procedures. Each table is read, sanitized (Decimal → float), and bulk-inserted into `mexico_migration_nosql`.
 
 ---
 
-### Phase 4 — Patches `Programs/aplicar_patches.py`
+### Phase 4 — Patches `Programs/phase4_patches.py`
 
 Applies `Databases/patches.sql` to improve the SQL views used by the dashboard. Patches remove Mexico-only filters and add the `iso_code` column for better international comparison.
 
