@@ -15,17 +15,21 @@ cd Proyecto-final_Analisis-de-la-migracion-internacional-hacia-mexico
 
 ### Step 2: Install Python 3.9+
 
-If you don't have Python installed, download it from [python.org](https://www.python.org/downloads/).
+Download it from [python.org](https://www.python.org/downloads/).
 
-> **Important for Windows users:** During installation, check the box **"Add Python to PATH"**. This avoids errors like `pip is not recognized` or `Python was not found` later.
+> **IMPORTANT for Windows:** During installation, check the box **"Add Python to PATH"** at the bottom of the first screen. This prevents the following errors:
+> - `pip is not recognized`
+> - `Python was not found`
+> - `Token '-m' inesperado` in PowerShell
 
-If Python is already installed but not in PATH, you must use the full path in PowerShell:
+If Python is already installed but not in PATH, you must use the full path in PowerShell. **Replace `YourUser` with your actual Windows username** and adjust the Python version number:
 
 ```powershell
+# Example — change "YourUser" and "Python314" to match your system
 & "C:\Users\YourUser\AppData\Local\Programs\Python\Python314\python.exe" -m pip install -r requirements.txt
 ```
 
-The `&` symbol is required in PowerShell when running a command from a quoted path.
+> **Note for PowerShell:** The `&` symbol is required before a quoted path. Without it, PowerShell throws `Token '-m' inesperado`.
 
 ### Step 3: Open the project in PyCharm
 
@@ -35,30 +39,42 @@ The `&` symbol is required in PowerShell when running a command from a quoted pa
 4. Select your Python installation (e.g. `Python314\python.exe`)
 5. Click **OK**
 
-> **Note:** PyCharm may auto-create a `.venv` folder. If it gives errors, delete it:
+PyCharm will automatically create a `.venv` (virtual environment). You will see `(.venv)` in green at the start of your terminal prompt. **This is normal — keep it active.**
+
+If the `.venv` gives errors, delete it and reconfigure:
+```powershell
+Remove-Item -Recurse -Force .venv
+```
+
+> **If you get a PowerShell execution policy error**, run this first:
 > ```powershell
-> Remove-Item -Recurse -Force .venv
+> Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 > ```
 
 ### Step 4: Install dependencies
 
-In PyCharm's terminal:
+**Option A — If `.venv` is active** (you see `(.venv)` in green):
 
 ```bash
 pip install -r requirements.txt
 ```
 
-If `pip` is not recognized, use:
+**Option B — If `pip` is not recognized:**
 
-```powershell
+```bash
 python -m pip install -r requirements.txt
 ```
 
-Or with the full Python path:
+**Option C — If neither works, use the full Python path** (replace with your username):
 
 ```powershell
 & "C:\Users\YourUser\AppData\Local\Programs\Python\Python314\python.exe" -m pip install -r requirements.txt
 ```
+
+> **Common mistakes:**
+> - `pip install -requierements.txt` → WRONG. It's `-r requirements.txt` (with a space after `-r`)
+> - `pip install requirements.txt` → WRONG. You need the `-r` flag
+> - Using someone else's Python path → WRONG. Each person must use their own path
 
 ### Step 5: Set up MySQL
 
@@ -87,9 +103,13 @@ Open each of these files and set your MySQL root password where it says `"passwo
 
 ### Step 7: Run the ETL pipeline
 
-From the project root folder:
+From the project root folder. **Make sure you are in the project root, NOT inside a subfolder:**
 
 ```bash
+# Verify you're in the right folder — you should see run_all.py
+dir run_all.py
+
+# Then run the pipeline
 python run_all.py
 ```
 
@@ -120,21 +140,26 @@ python run_all.py --from load      # start from Phase 3
 
 ### Step 8: Launch the dashboard
 
-From the project root folder (not inside Dashboards/):
+From the project root folder (NOT inside Dashboards/):
 
 ```bash
 python -m streamlit run Dashboards/dashboard.py
 ```
 
-Or with the full path:
+> **Important:**
+> - Run this from the **project root**, not from inside the `Dashboards/` folder
+> - The command must be a **single line** — do not split it across multiple lines
+> - If you're inside `Dashboards/`, go back with `cd ..`
+
+If `python` is not recognized:
 
 ```powershell
 & "C:\Users\YourUser\AppData\Local\Programs\Python\Python314\python.exe" -m streamlit run Dashboards\dashboard.py
 ```
 
-> **Important:** Run this from the project root, NOT from inside the `Dashboards/` folder. The command must be a single line — do not split it across multiple lines.
-
 A browser window will open automatically at `http://localhost:8501` with 5 interactive dashboards.
+
+> **About `.venv`:** You do NOT need to deactivate the virtual environment to run the dashboard. Keep `(.venv)` active — it works fine with Streamlit.
 
 ---
 
@@ -143,13 +168,19 @@ A browser window will open automatically at `http://localhost:8501` with 5 inter
 | Problem | Solution |
 |---------|----------|
 | `pip is not recognized` | Use `python -m pip install -r requirements.txt` or add Python to PATH |
-| `Python was not found` | Use the full path: `& "C:\...\python.exe" -m pip install -r requirements.txt` |
+| `Python was not found` | Use the full path: `& "C:\Users\YourUser\AppData\Local\Programs\Python\Python314\python.exe" -m pip ...` |
 | `Token '-m' inesperado` in PowerShell | Add `&` before the quoted path: `& "C:\...\python.exe" -m pip ...` |
-| `.venv` errors in PyCharm | Delete `.venv` folder and reconfigure interpreter |
+| `Invalid requirement: '.txt'` | You typed `-requirements.txt` instead of `-r requirements.txt`. Use `-r` with a space |
+| `YourUser` path not found | Replace `YourUser` with your actual Windows username |
+| PowerShell execution policy error | Run `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser` |
+| `.venv` errors in PyCharm | Delete `.venv` folder and reconfigure interpreter: `Remove-Item -Recurse -Force .venv` |
+| `.venv` activates automatically | This is normal. Keep it active — you can run all commands inside `.venv` |
 | `IndentationError` in phase1_extraction.py | Make sure you have the latest version from GitHub (fixed) |
 | `Access denied` MySQL | Check your password in the 4 files from Step 6 |
-| Streamlit `File does not exist` | Run from project root, not from inside Dashboards/ |
+| Streamlit `File does not exist: streamlit_app.py` | You forgot to specify the file. Use `python -m streamlit run Dashboards\dashboard.py` |
+| Streamlit `File does not exist: Dashboards\dashboard.py` | You're inside `Dashboards/`. Run `cd ..` and then the command from project root |
 | Dashboard shows empty charts | Make sure `run_all.py` completed successfully first |
+| `where python` returns nothing | Python is not installed or not in PATH. Reinstall with "Add to PATH" checked |
 
 ---
 
