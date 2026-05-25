@@ -2,73 +2,154 @@
 > Final Integrative Project — Programming · Database · Data Analysis
 ---
 
-## Quick Start
+## User Manual — How to Run the Project
 
-### Prerequisites
+### Step 1: Clone the repository
 
-| Requirement | Version |
-|-------------|---------|
-| Python | 3.9+ |
-| MySQL Server | 8.0+ |
-| MongoDB | 6.0+ (optional, for NoSQL clone) |
+Open a terminal (PowerShell, CMD, or Git Bash) and run:
 
-### Setup Instructions
+```bash
+git clone https://github.com/daria098-ux/Proyecto-final_Analisis-de-la-migracion-internacional-hacia-mexico.git
+cd Proyecto-final_Analisis-de-la-migracion-internacional-hacia-mexico
+```
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/daria098-ux/Proyecto-final_Analisis-de-la-migracion-internacional-hacia-mexico.git
-   cd Proyecto-final_Analisis-de-la-migracion-internacional-hacia-mexico
-   ```
+### Step 2: Install Python 3.9+
 
-2. **Install Python dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
+If you don't have Python installed, download it from [python.org](https://www.python.org/downloads/).
 
-3. **Create the MySQL database**
+> **Important for Windows users:** During installation, check the box **"Add Python to PATH"**. This avoids errors like `pip is not recognized` or `Python was not found` later.
 
-   Open MySQL Workbench (or any MySQL client) and run:
-   ```sql
-   -- Execute the full schema script (creates database, tables, triggers, SPs and views)
-   source Databases/mexico_migration_final.sql;
-   ```
+If Python is already installed but not in PATH, you must use the full path in PowerShell:
 
-4. **Configure your MySQL password**
+```powershell
+& "C:\Users\YourUser\AppData\Local\Programs\Python\Python314\python.exe" -m pip install -r requirements.txt
+```
 
-   Open each of these files and set your MySQL root password where it says `"password": ""`:
-   - `Programs/phase3_loading.py` → line `"password": ""`
-   - `Programs/phase3.5_mongodb_clone.py` → line `password=""`
-   - `Programs/phase4_patches.py` → line `"password": ""`
-   - `Dashboards/export_views.py` → line `"password": ""`
+The `&` symbol is required in PowerShell when running a command from a quoted path.
 
-5. **Run the full ETL pipeline**
-   ```bash
-   python run_all.py
-   ```
+### Step 3: Open the project in PyCharm
 
-   This automatically executes all phases in order:
-   ```
-   Phase 1  →  Extraction (APIs + CSVs)
-   Phase 2  →  Transformation (cleaning)
-   Phase 3  →  MySQL Loading (stored procedures)
-   Phase 4  →  SQL Patches (improved views)
-   Phase 5  →  MongoDB Clone (optional, use --skip-mongo to skip)
-   Phase 6  →  Export Views (generates CSVs for dashboard)
-   ```
+1. Open PyCharm → **File → Open** → select the cloned folder
+2. Go to **File → Settings → Project → Python Interpreter**
+3. Click the **gear icon** → **Add Interpreter → System Interpreter**
+4. Select your Python installation (e.g. `Python314\python.exe`)
+5. Click **OK**
 
-6. **Launch the dashboard**
-   ```bash
-   cd Dashboards
-   streamlit run dashboard.py
-   ```
+> **Note:** PyCharm may auto-create a `.venv` folder. If it gives errors, delete it:
+> ```powershell
+> Remove-Item -Recurse -Force .venv
+> ```
 
-### Optional Commands
+### Step 4: Install dependencies
+
+In PyCharm's terminal:
+
+```bash
+pip install -r requirements.txt
+```
+
+If `pip` is not recognized, use:
+
+```powershell
+python -m pip install -r requirements.txt
+```
+
+Or with the full Python path:
+
+```powershell
+& "C:\Users\YourUser\AppData\Local\Programs\Python\Python314\python.exe" -m pip install -r requirements.txt
+```
+
+### Step 5: Set up MySQL
+
+1. Install **MySQL Server 8.0+** and **MySQL Workbench** if not already installed
+2. Open MySQL Workbench and connect to your local server
+3. Run the database schema script:
+
+```sql
+source Databases/mexico_migration_final.sql;
+```
+
+This creates the `mexico_migration` database with all 14 tables, triggers, stored procedures, and views.
+
+### Step 6: Configure your MySQL password
+
+Open each of these files and set your MySQL root password where it says `"password": ""`:
+
+| File | Line to change |
+|------|---------------|
+| `Programs/phase3_loading.py` | `"password": ""` → `"password": "your_password"` |
+| `Programs/phase3.5_mongodb_clone.py` | `password=""` → `password="your_password"` |
+| `Programs/phase4_patches.py` | `"password": ""` → `"password": "your_password"` |
+| `Dashboards/export_views.py` | `"password": ""` → `"password": "your_password"` |
+
+> **Security:** Never commit your password to GitHub. The files use empty strings by default. Only set your password locally.
+
+### Step 7: Run the ETL pipeline
+
+From the project root folder:
+
+```bash
+python run_all.py
+```
+
+If `python` is not recognized:
+
+```powershell
+& "C:\Users\YourUser\AppData\Local\Programs\Python\Python314\python.exe" run_all.py
+```
+
+The pipeline runs 6 phases in order:
+
+```
+Phase 1  →  Extraction (APIs + CSVs)
+Phase 2  →  Transformation (cleaning)
+Phase 3  →  MySQL Loading (stored procedures)
+Phase 4  →  SQL Patches (improved views)
+Phase 5  →  MongoDB Clone (optional)
+Phase 6  →  Export Views (generates CSVs for dashboard)
+```
+
+**Optional flags:**
 
 ```bash
 python run_all.py --skip-mongo     # skip MongoDB cloning
 python run_all.py --only extract   # run only Phase 1
 python run_all.py --from load      # start from Phase 3
 ```
+
+### Step 8: Launch the dashboard
+
+From the project root folder (not inside Dashboards/):
+
+```bash
+python -m streamlit run Dashboards/dashboard.py
+```
+
+Or with the full path:
+
+```powershell
+& "C:\Users\YourUser\AppData\Local\Programs\Python\Python314\python.exe" -m streamlit run Dashboards\dashboard.py
+```
+
+> **Important:** Run this from the project root, NOT from inside the `Dashboards/` folder. The command must be a single line — do not split it across multiple lines.
+
+A browser window will open automatically at `http://localhost:8501` with 5 interactive dashboards.
+
+---
+
+### Troubleshooting (Windows)
+
+| Problem | Solution |
+|---------|----------|
+| `pip is not recognized` | Use `python -m pip install -r requirements.txt` or add Python to PATH |
+| `Python was not found` | Use the full path: `& "C:\...\python.exe" -m pip install -r requirements.txt` |
+| `Token '-m' inesperado` in PowerShell | Add `&` before the quoted path: `& "C:\...\python.exe" -m pip ...` |
+| `.venv` errors in PyCharm | Delete `.venv` folder and reconfigure interpreter |
+| `IndentationError` in phase1_extraction.py | Make sure you have the latest version from GitHub (fixed) |
+| `Access denied` MySQL | Check your password in the 4 files from Step 6 |
+| Streamlit `File does not exist` | Run from project root, not from inside Dashboards/ |
+| Dashboard shows empty charts | Make sure `run_all.py` completed successfully first |
 
 ---
 
@@ -227,7 +308,7 @@ Applies `Databases/patches.sql` to improve the SQL views used by the dashboard. 
 | 4 | Risks and Threats | `vw_migrant_risks` |
 | 5 | Impacts on Mexico | `vw_impacts_on_mexico` + `vw_demographic_profile` |
 
-**Run:** `streamlit run Dashboards/dashboard.py`
+**Run:** `python -m streamlit run Dashboards/dashboard.py`
 
 ---
 
