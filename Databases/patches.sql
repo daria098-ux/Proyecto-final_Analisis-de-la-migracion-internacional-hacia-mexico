@@ -1,28 +1,28 @@
 -- ============================================================================
--- patches.sql - Mejoras a las vistas del esquema mexico_migration
+-- patches.sql - Improvements to the mexico_migration schema views
 -- ============================================================================
--- Aplicar DESPUES de mexico_migration_final.sql y despues de haber cargado
--- los datos con el pipeline (run_all.py).
+-- Apply AFTER mexico_migration_final.sql and after loading the data
+-- with the pipeline (run_all.py).
 --
--- Estas vistas reemplazan las originales para que el dashboard tenga datos
--- mas ricos y para que los graficos (choropleth, sunburst, etc) reciban
--- las columnas que necesitan (ISO codes, etc).
+-- These views replace the original ones so the dashboard has richer data
+-- and so the charts (choropleth, sunburst, etc.) receive the columns they need
+-- (ISO codes, etc.).
 --
--- Compatible con el esquema final que tiene la columna global_statistics.source
+-- Compatible with the final schema that includes the global_statistics.source column.
 --
--- Como aplicar:
---   1. Abrir este archivo en MySQL Workbench
---   2. Verificar que estas conectado y la BD activa es mexico_migration
---   3. Ejecutar todo el script con el rayo amarillo
+-- How to apply:
+--   1. Open this file in MySQL Workbench
+--   2. Verify that you are connected and that the active database is mexico_migration
+--   3. Run the entire script using the yellow lightning bolt
 -- ============================================================================
 
 USE mexico_migration;
 
 -- ----------------------------------------------------------------------------
--- 1. vw_top_motives - REMOVER el filtro destino='Mexico'
---    La version original solo mostraba motivos de quienes migran HACIA Mexico.
---    Como INEGI tiene mexicanos que EMIGRAN, solo daba 3 motivos. Esta version
---    muestra todos los motivos de migracion en la base.
+-- 1. vw_top_motives - REMOVE the destination = 'Mexico' filter
+-- The original version only showed reasons for people migrating TO Mexico.
+-- Since INEGI includes Mexicans who EMIGRATE, it only returned 3 reasons. This version
+-- shows all migration reasons in the database.
 -- ----------------------------------------------------------------------------
 DROP VIEW IF EXISTS vw_top_motives;
 
@@ -39,11 +39,11 @@ ORDER BY total_migrations DESC;
 
 
 -- ----------------------------------------------------------------------------
--- 2. vw_origin_countries - Usar global_statistics (UNHCR) + iso_code
---    La version original miraba migrants.origin_country_id, que con INEGI
---    siempre da 'Mexico'. Esta version usa global_statistics filtrando
---    source='UNHCR' (que es donde estan los paises de origen reales hacia Mexico).
---    Agregamos iso_code para poder hacer mapas choropleth.
+-- 2. vw_origin_countries - Use global_statistics (UNHCR) + iso_code
+--    The original version looked at migrants.origin_country_id, which with INEGI
+--    always returns 'Mexico'. This version uses global_statistics filtered by
+--    source = 'UNHCR' (which is where the real countries of origin toward Mexico are stored).
+--    We add iso_code to be able to create choropleth maps.
 -- ----------------------------------------------------------------------------
 DROP VIEW IF EXISTS vw_origin_countries;
 
@@ -63,7 +63,7 @@ ORDER BY total_migrants DESC;
 
 
 -- ----------------------------------------------------------------------------
--- 3. vw_international_comparison - Agregar iso_code para choropleth
+-- 3. vw_international_comparison - Add iso_code for choropleth maps
 -- ----------------------------------------------------------------------------
 DROP VIEW IF EXISTS vw_international_comparison;
 
@@ -81,7 +81,7 @@ ORDER BY gs.year DESC, gs.total_migrants DESC;
 
 
 -- ----------------------------------------------------------------------------
--- 4. vw_migrant_risks - Sin filtro de destino (mas datos disponibles)
+-- 4. vw_migrant_risks - No destination filter (more available data)
 -- ----------------------------------------------------------------------------
 DROP VIEW IF EXISTS vw_migrant_risks;
 
@@ -97,7 +97,7 @@ ORDER BY cases DESC;
 
 
 -- ----------------------------------------------------------------------------
--- 5. vw_impacts_on_mexico - Sin cambios funcionales (ya estaba bien)
+-- 5. vw_impacts_on_mexico - No functional changes
 -- ----------------------------------------------------------------------------
 DROP VIEW IF EXISTS vw_impacts_on_mexico;
 
@@ -113,7 +113,7 @@ ORDER BY impact_type, frequency DESC;
 
 
 -- ----------------------------------------------------------------------------
--- 6. vw_demographic_profile - Quitar average_age (la edad no existe en INEGI)
+-- 6. vw_demographic_profile - Remove "average_age" (age is not a field in INEGI)
 -- ----------------------------------------------------------------------------
 DROP VIEW IF EXISTS vw_demographic_profile;
 
@@ -130,7 +130,7 @@ ORDER BY total DESC;
 
 
 -- ----------------------------------------------------------------------------
--- VERIFICACION: contar filas en cada vista para confirmar el fix
+-- VERIFICATION: Count the rows in each view to confirm the fix
 -- ----------------------------------------------------------------------------
 SELECT 'vw_top_motives'                 AS vista, COUNT(*) AS filas FROM vw_top_motives
 UNION ALL
